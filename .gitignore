@@ -1,0 +1,274 @@
+# MAVIRE CODOIR - Comprehensive .gitignore
+# ================================================
+# This file prevents sensitive and generated files from being committed to git
+# CRITICAL: Never commit API keys, credentials, or personal data
+
+# ================================================
+# ENVIRONMENT VARIABLES & SECRETS (CRITICAL)
+# ================================================
+# Never commit these files - they contain sensitive credentials
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+*.env
+.env.*
+
+# Backup files that might contain secrets
+.env.backup
+.env.bak
+
+# ================================================
+# DEPENDENCIES
+# ================================================
+node_modules/
+/.pnp
+.pnp.js
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Package manager lock files (keep package-lock.json but not others)
+yarn.lock
+pnpm-lock.yaml
+
+# ================================================
+# NEXT.JS BUILD OUTPUT
+# ================================================
+/.next/
+/out/
+/build/
+.next/
+dist/
+
+# Next.js cache
+.next/cache/
+
+# ================================================
+# TESTING
+# ================================================
+/coverage
+/coverage.*
+*.lcov
+.nyc_output
+
+# Test results
+test-results/
+junit.xml
+
+# ================================================
+# PRODUCTION
+# ================================================
+/build
+/dist
+*.production.*
+
+# ================================================
+# DEBUG LOGS
+# ================================================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ================================================
+# OPERATING SYSTEM FILES
+# ================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ================================================
+# IDE & EDITOR FILES
+# ================================================
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# WebStorm / JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ================================================
+# TYPESCRIPT
+# ================================================
+*.tsbuildinfo
+next-env.d.ts
+*.d.ts.map
+
+# ================================================
+# DEPLOYMENT
+# ================================================
+.vercel
+.netlify
+.firebase/
+.amplify/
+
+# ================================================
+# SECURITY & CERTIFICATES
+# ================================================
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# ================================================
+# TEMPORARY FILES
+# ================================================
+*.tmp
+*.temp
+*.cache
+.cache/
+tmp/
+temp/
+
+# ================================================
+# BACKUP FILES
+# ================================================
+*.backup
+*.bak
+*.old
+*.orig
+
+# ================================================
+# SHOPIFY & E-COMMERCE SPECIFIC
+# ================================================
+# Customer data exports (if any)
+customers.csv
+orders.csv
+*.customer.json
+*.order.json
+
+# Payment information (should never be stored locally)
+payment*/
+
+# ================================================
+# MEDIA & ASSETS (Large Files)
+# ================================================
+# Uncomment if you want to exclude large media files
+# public/uploads/
+# public/videos/
+# *.mp4
+# *.mov
+# *.avi
+
+# ================================================
+# ANALYTICS & TRACKING
+# ================================================
+# Google Analytics data files
+*.ga.json
+analytics-*.json
+
+# ================================================
+# DOCUMENTATION (Sensitive)
+# ================================================
+# Internal documentation that shouldn't be public
+README-INTERNAL.md
+NOTES.md
+TODO-PRIVATE.md
+CREDENTIALS.md
+
+# ================================================
+# MISC
+# ================================================
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Database files (if any local DBs)
+*.db
+*.sqlite
+*.sqlite3
+
+# Python (if using any Python tools)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+ENV/
+
+# Ruby (if using any Ruby tools)
+*.gem
+*.rbc
+.bundle/
+vendor/bundle/
+
+# ================================================
+# PROJECT SPECIFIC
+# ================================================
+# Add any project-specific files or folders here
+
+# Development notes (if you want to keep them private)
+notes/
+private/
+internal/
+
+# Screenshots with sensitive data
+screenshots/
+*.screenshot.png
+
+# ================================================
+# END OF .gitignore
+# ================================================
+# Remember: When in doubt, don't commit it!
+# It's better to exclude too much than too little.
+next-env.d.ts
