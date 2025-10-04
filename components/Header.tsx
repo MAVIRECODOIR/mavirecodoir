@@ -2,11 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { MagnifyingGlassIcon, ShoppingBagIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, ShoppingBagIcon, Bars3Icon, XMarkIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { itemCount: cartCount, toggleCart } = useCart();
+  const { itemCount: wishlistCount } = useWishlist();
 
   const navigation = [
     { name: 'New Arrivals', href: '/collections/new-arrivals' },
@@ -85,15 +89,30 @@ export function Header() {
               </button>
 
               <Link
-                href="/cart"
+                href="/wishlist"
+                className="relative text-[#5c5c5c] hover:text-[#323232] transition-colors hidden md:block"
+                aria-label="Wishlist"
+              >
+                <HeartIcon className="h-6 w-6" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              <button
+                onClick={toggleCart}
                 className="relative text-[#5c5c5c] hover:text-[#323232] transition-colors"
                 aria-label="Shopping cart"
               >
                 <ShoppingBagIcon className="h-6 w-6" />
-                <span className="absolute -top-2 -right-2 bg-[#5c5c5c] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  0
-                </span>
-              </Link>
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#5c5c5c] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
@@ -159,12 +178,21 @@ export function Header() {
                   Account
                 </Link>
                 <Link
-                  href="/cart"
-                  className="block text-base text-[#5c5c5c] hover:text-[#323232] uppercase tracking-wide"
+                  href="/wishlist"
+                  className="block text-base text-[#5c5c5c] hover:text-[#323232] uppercase tracking-wide mb-4"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Cart (0)
+                  Wishlist ({wishlistCount})
                 </Link>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    toggleCart();
+                  }}
+                  className="block w-full text-left text-base text-[#5c5c5c] hover:text-[#323232] uppercase tracking-wide"
+                >
+                  Cart ({cartCount})
+                </button>
               </div>
             </div>
           </div>

@@ -4,6 +4,9 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { CartProvider } from '@/contexts/CartContext';
+import { WishlistProvider } from '@/contexts/WishlistContext';
+import CartDrawer from '@/components/cart/CartDrawer';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,13 +34,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-        <Analytics />
-        <SpeedInsights />
+        <CartProvider>
+          <WishlistProvider>
+            <Header />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <CartDrawer />
+            <Analytics />
+            <SpeedInsights />
+          </WishlistProvider>
+        </CartProvider>
       </body>
     </html>
   );

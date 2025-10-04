@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Button } from '../ui/Button';
 import VariantSelector from './VariantSelector';
 import QuantitySelector from './QuantitySelector';
+import WishlistButton from '../wishlist/WishlistButton';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductVariant {
   id: string;
@@ -32,6 +34,7 @@ interface ProductInfoProps {
     variants: ProductVariant[];
     options: ProductOption[];
     tags: string[];
+    images?: string[];
   };
   showVendor?: boolean;
   showShareButtons?: boolean;
@@ -44,23 +47,22 @@ export default function ProductInfo({
 }: ProductInfoProps) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { addItem, isLoading: isAddingToCart } = useCart();
 
   const isOnSale = selectedVariant.compareAtPrice && 
     parseFloat(selectedVariant.compareAtPrice) > parseFloat(selectedVariant.price);
 
   const handleAddToCart = async () => {
-    setIsAddingToCart(true);
-    
-    // TODO: Implement cart functionality
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    console.log('Adding to cart:', {
+    await addItem({
       variantId: selectedVariant.id,
+      productId: product.id,
+      title: product.title,
+      variantTitle: selectedVariant.title,
+      price: selectedVariant.price,
+      image: product.images?.[0] || '',
       quantity,
+      handle: product.handle,
     });
-    
-    setIsAddingToCart(false);
   };
 
   const handleShare = (platform: 'facebook' | 'twitter' | 'pinterest') => {
@@ -148,21 +150,38 @@ export default function ProductInfo({
         />
       </div>
 
-      {/* Add to Cart Button */}
+      {/* Add to Cart & Wishlist Buttons */}
       <div className="space-y-3 pt-4">
-        <Button
-          variant="primary"
-          size="lg"
-          fullWidth
-          onClick={handleAddToCart}
-          disabled={!selectedVariant.available || isAddingToCart}
-        >
-          {isAddingToCart
-            ? 'Adding...'
-            : selectedVariant.available
-            ? 'Add to Cart'
-            : 'Sold Out'}
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+            onClick={handleAddToCart}
+            disabled={!selectedVariant.available || isAddingToCart}
+            className="flex-1"
+          >
+            {isAddingToCart
+              ? 'Adding...'
+              : selectedVariant.available
+              ? 'Add to Cart'
+              : 'Sold Out'}
+          </Button>
+          
+          <WishlistButton
+            product={{
+              id: product.id,
+              productId: product.id,
+              handle: product.handle,
+              title: product.title,
+              price: selectedVariant.price,
+              image: product.images?.[0] || '',
+              vendor: product.vendor,
+              available: selectedVariant.available,
+            }}
+            className="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-gray-300 hover:border-gray-900"
+          />
+        </div>
 
         {/* Share Buttons */}
         {showShareButtons && (
