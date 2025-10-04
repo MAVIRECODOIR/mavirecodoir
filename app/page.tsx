@@ -1,5 +1,8 @@
 import { Slideshow } from '@/components/sections/Slideshow';
 import { FeaturedCollections } from '@/components/sections/FeaturedCollections';
+import { ImageWithTextBlock } from '@/components/sections/ImageWithTextBlock';
+import { CollectionList } from '@/components/sections/CollectionList';
+import { Testimonials } from '@/components/sections/Testimonials';
 
 export default function Home() {
   // Temporary placeholder data - will be replaced with Shopify API data
@@ -115,7 +118,87 @@ export default function Home() {
         maxItems={8}
       />
 
-      {/* More sections will be added here */}
+      {/* Image with Text Block - Trending Jewelry */}
+      <ImageWithTextBlock
+        image="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80"
+        title="TRENDING JEWELRY"
+        content="<p>Show off your personality with meaningful, eco-conscious expandable bracelets, necklaces, rings, and earrings that empower the light within you.</p>"
+        buttonLabel="Shop Now"
+        buttonLink="/collections/jewelry"
+        backgroundColor="#515c63"
+        textColor="#ffffff"
+        imagePosition="left"
+        showParallax={true}
+      />
+
+      {/* Collection List - Categories */}
+      <CollectionList
+        collections={[
+          {
+            id: '1',
+            handle: 'watches',
+            title: 'LUXURY WATCHES',
+            subheading: "you'll find the perfect fit for your wrist",
+            image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+            buttonText: 'View products',
+            applyOverlay: true,
+          },
+          {
+            id: '2',
+            handle: 'gadgets',
+            title: 'Smart Gadgets',
+            subheading: 'ultimate guide to the newest and coolest gadgets',
+            image: 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=800&q=80',
+            buttonText: 'View products',
+            applyOverlay: true,
+          },
+          {
+            id: '3',
+            handle: 'phone-accessories',
+            title: 'Phone Accessories',
+            subheading: 'Stay in touch with our latest phone accessories',
+            image: 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&q=80',
+            buttonText: 'View products',
+            applyOverlay: true,
+          },
+        ]}
+        imageSize="medium"
+        addSpacing={true}
+      />
+
+      {/* Testimonials */}
+      <Testimonials
+        testimonials={[
+          {
+            id: '1',
+            quote: 'I was searching on Google for beauty products and I got exactly what I needed here, I recommend',
+            author: 'Sarah M.',
+            rating: 5,
+          },
+          {
+            id: '2',
+            quote: 'I always want to give a touch to my wrist with luxury watches, I found the perfect and affordable watch on this web shop.',
+            author: 'James K.',
+            rating: 5,
+          },
+          {
+            id: '3',
+            quote: 'I love everything in here, I took my time and searched through this shop and I really love their quality products.',
+            author: 'Emily R.',
+            rating: 5,
+          },
+          {
+            id: '4',
+            quote: 'Excellent services, is my first time buying from this store, I got my product in good shape with very convenient process.',
+            author: 'Michael T.',
+            rating: 5,
+          },
+        ]}
+        autoplay={true}
+        cycleSpeed={5}
+        backgroundColor="#31648b"
+        textColor="#f8f8f8"
+      />
     </>
   );
 }
