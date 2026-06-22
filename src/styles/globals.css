@@ -1,0 +1,931 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-display), "EB Garamond", Georgia, "Times New Roman", "Palatino Linotype", serif;
+
+  --color-brand-black: #000000;
+  --color-brand-white: #FFFFFF;
+  --color-brand-cream: #F5F1EB;
+  --color-brand-gold: #C4A265;
+  --color-brand-grey-100: #F7F7F7;
+  --color-brand-grey-200: #EBEBEB;
+  --color-brand-grey-300: #CCCCCC;
+  --color-brand-grey-400: #999999;
+  --color-brand-grey-500: #666666;
+  --color-brand-grey-600: #333333;
+
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-30: 7.5rem;
+
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-slide-up: slide-up 0.8s ease-out forwards;
+
+  @keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+:root {
+  color-scheme: light;
+  --header-height: 60px;
+  --logo-full-height: 120px;
+  --logo-collapsed-height: 28px;
+  --vh: 1vh;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #000;
+    background: #fff;
+    overflow-x: hidden;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  button:hover {
+    opacity: 0.6;
+  }
+
+  button:active {
+    opacity: 0.45;
+    transform: scale(0.97);
+  }
+
+  button:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  ul, ol {
+    list-style: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Hide Google Maps API error banner (shows when API key lacks required APIs) */
+  #map-errors-panel,
+  div[id^="map-"],
+  body > div[style*="z-index: 10000"][style*="background"] {
+    display: none !important;
+  }
+}
+
+@utility luxury-container {
+  width: 100%;
+  max-width: 1920px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  @media (min-width: 768px) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@utility luxury-heading-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+@utility luxury-heading-lg {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility luxury-heading-md {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+}
+
+@utility luxury-body {
+  font-size: clamp(0.8125rem, 1vw, 0.9375rem);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1.6;
+}
+
+@utility luxury-caption {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.luxury-link {
+  position: relative;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.luxury-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s ease;
+}
+
+.luxury-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.mavire-btn-motion {
+  transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.mavire-btn-motion:hover {
+  opacity: 0.6;
+}
+
+.mavire-btn-motion:active {
+  opacity: 0.45;
+  transform: scale(0.97);
+}
+
+.mavire-btn-motion:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ═══ MAVIRE CODIR-style CTA buttons ═══ */
+
+/* Shared CTA base — matches luxury transparent button spec */
+.luxury-btn-primary,
+.luxury-btn-white,
+.luxury-btn-outline,
+.luxury-btn-secondary-inversed {
+  display: inline-block;
+  position: relative;
+  background: transparent;
+  border: 0;
+  padding: 16px 24px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1rem;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-font-smoothing: antialiased;
+  transition: 0.8s cubic-bezier(0.5, 0, 0, 1) 0.4s, transform 0.3s ease-out;
+  pointer-events: auto;
+  gap: 0.5rem;
+  z-index: 0;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  box-sizing: border-box;
+  color: var(--g-color-foreground, #000);
+  opacity: 1 !important;
+  width: auto;
+  transform: translateY(0%);
+}
+
+.luxury-btn-primary:hover,
+.luxury-btn-white:hover,
+.luxury-btn-outline:hover,
+.luxury-btn-secondary-inversed:hover {
+  transform: scale(0.95);
+}
+
+.luxury-btn-primary:focus-visible,
+.luxury-btn-white:focus-visible,
+.luxury-btn-outline:focus-visible,
+.luxury-btn-secondary-inversed:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Primary — dark text on light backgrounds */
+.luxury-btn-primary {
+  --_g-cta-color-primary: var(--g-color-foreground, #000);
+  color: var(--_g-cta-color-primary);
+}
+
+/* White — dark text, used on light backgrounds (same visual as primary) */
+.luxury-btn-white {
+  --_g-cta-color-primary: var(--g-color-foreground, #000);
+  color: var(--_g-cta-color-primary);
+}
+
+/* Outline — dark text on light backgrounds */
+.luxury-btn-outline {
+  --_g-cta-color-primary: var(--g-color-foreground, #000);
+  color: var(--_g-cta-color-primary);
+}
+
+/* Secondary Inversed — white text on dark/image backgrounds */
+.luxury-btn-secondary-inversed {
+  --_g-cta-color-primary: var(--g-color-background, #fff);
+  color: var(--_g-cta-color-primary);
+  position: relative;
+  text-decoration: none;
+}
+
+.luxury-btn-secondary-inversed::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.3s ease-out;
+}
+
+.luxury-btn-secondary-inversed:hover::after {
+  width: 100%;
+}
+
+/* ═══ Product Grid — exact Dior CSS from dior.com ═══ */
+
+/* Grid container base */
+.dior-grid {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: row;
+}
+@media (min-width: 0px) {
+  .dior-grid {
+    width: calc(100% + 4px);
+    margin-left: -2px;
+  }
+  .dior-grid > .MuiGrid-item {
+    padding-left: 2px;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid {
+    width: calc(100% + 8px);
+    margin-left: -4px;
+  }
+  .dior-grid > .MuiGrid-item {
+    padding-left: 4px;
+  }
+}
+@media (min-width: 0px) {
+  .dior-grid {
+    row-gap: 4px;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid {
+    row-gap: 8px;
+  }
+}
+
+/* Grid item base */
+.dior-grid > .MuiGrid-item {
+  box-sizing: border-box;
+  margin: 0;
+  flex-direction: row;
+  flex-basis: 50%;
+  flex-grow: 0;
+  max-width: 50%;
+}
+@media (min-width: 600px) {
+  .dior-grid > .MuiGrid-item {
+    flex-basis: 50%;
+    flex-grow: 0;
+    max-width: 50%;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid > .MuiGrid-item {
+    flex-basis: 25%;
+    flex-grow: 0;
+    max-width: 25%;
+  }
+}
+
+/* DS-Card */
+.dior-grid .DS-Card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.dior-grid .DS-Card a {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* DS-Card hover: shift legend */
+.dior-grid .DS-Card:hover .legend-wrapper:not(.animation-disabled),
+.dior-grid .DS-Card:focus .legend-wrapper:not(.animation-disabled),
+.dior-grid .DS-Card:focus-within .legend-wrapper:not(.animation-disabled) {
+  margin-top: 2px;
+}
+
+/* DS-Card active states */
+
+/* Image section container */
+.dior-grid .card-image-section {
+  position: relative;
+}
+
+/* DS-Carousel */
+.dior-grid .DS-Carousel {
+  --swiper-navigation-color: #33383CFF;
+  --swiper-pagination-color: #33383CFF;
+  position: relative;
+  --gradient-color: #F8F8F8FF;
+  --scrollbar-color: #33383CFF;
+}
+
+/* Swiper */
+.dior-grid .swiper {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  z-index: auto;
+  display: block;
+  width: 100%;
+}
+@media (max-width: 1032px) {
+  .dior-grid .swiper {
+    touch-action: none;
+  }
+}
+.dior-grid .swiper-wrapper {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  box-sizing: content-box;
+}
+.dior-grid .swiper-wrapper::before {
+  content: "";
+  display: block;
+  padding-bottom: 133.333%;
+}
+.dior-grid .swiper-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  box-sizing: content-box;
+}
+.dior-grid .swiper-slide.swiper-slide-active {
+  opacity: 1;
+}
+.dior-grid .swiper-notification {
+  display: none;
+}
+/* Desktop-only arrow navigation (hidden on mobile for swipe) */
+@media (min-width: 1033px) {
+  .dior-grid .swiper-button-prev,
+  .dior-grid .swiper-button-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .dior-grid .card-image-section:hover .swiper-button-prev,
+  .dior-grid .card-image-section:hover .swiper-button-next {
+    opacity: 1;
+  }
+  .dior-grid .swiper-button-prev {
+    left: 8px;
+  }
+  .dior-grid .swiper-button-next {
+    right: 8px;
+  }
+  .dior-grid .swiper-button-prev svg,
+  .dior-grid .swiper-button-next svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+}
+
+/* Product link in image */
+.dior-grid .product-card__link {
+  border: 0;
+  background-color: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: Hellix, ABCDiorIcons, arial, sans-serif;
+  line-height: 17px;
+  font-size: 0.875rem;
+  color: rgb(51, 56, 60);
+  text-decoration: none;
+  padding: 0;
+  user-select: none;
+  display: block;
+}
+
+/* Image container with aspect ratio */
+.dior-grid .card-asset-container {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  overflow: hidden;
+  background-color: #E5E5E5FF;
+}
+.dior-grid .card-asset-inner {
+  height: 100%;
+  position: relative;
+}
+.dior-grid .DS-Image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+.dior-grid .main-asset {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.6s ease-in-out;
+  opacity: 1;
+}
+
+/* Tags overlay */
+.dior-grid .tags-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  top: 0;
+  justify-content: start;
+}
+.dior-grid .tags-inner {
+  display: flex;
+  width: 100%;
+  height: 32px;
+  z-index: 1;
+}
+@media (min-width: 0px) {
+  .dior-grid .tags-inner {
+    padding-left: 0px;
+    margin-top: 8px;
+  }
+}
+@media (min-width: 600px) {
+  .dior-grid .tags-inner {
+    padding-left: 8px;
+    margin-top: 16px;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid .tags-inner {
+    padding-left: 16px;
+    margin-top: 24px;
+  }
+}
+.dior-grid .tags-list {
+  list-style: none;
+  margin: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  max-width: 60%;
+}
+.dior-grid .tags-list-item {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  flex-basis: fit-content;
+}
+.dior-grid .tag-text {
+  margin: 0;
+  font-weight: 400;
+  font-family: Hellix, ABCDiorIcons, arial, sans-serif;
+  line-height: 14px;
+  letter-spacing: normal;
+  font-size: 0.75rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 0;
+  padding-bottom: 0;
+  text-transform: capitalize;
+  color: #7B8487FF;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: inherit;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+}
+
+/* Wishlist overlay */
+.dior-grid .wishlist-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  top: 0;
+  justify-content: end;
+}
+.dior-grid .wishlist-inner {
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+}
+@media (min-width: 0px) {
+  .dior-grid .wishlist-inner {
+    padding-top: 8px;
+    padding-right: 8px;
+  }
+}
+@media (min-width: 600px) {
+  .dior-grid .wishlist-inner {
+    padding-top: 16px;
+    padding-right: 16px;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid .wishlist-inner {
+    padding-top: 24px;
+    padding-right: 24px;
+  }
+}
+.dior-grid .wishlist-btn-wrap {
+  display: flex;
+}
+.dior-grid .wishlist-btn-outer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  text-decoration: none;
+  text-transform: unset;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: blur(25px);
+  background-color: #FEFEFE3F;
+  color: #FFFFFFFF;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 4px;
+  gap: 4px;
+  padding: 0;
+  font-weight: 500;
+  font-family: Hellix, ABCDiorIcons, arial, sans-serif;
+  line-height: 14px;
+  font-size: 0.75rem;
+}
+.dior-grid .wishlist-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  background-color: transparent;
+  outline: 0;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  text-decoration: none;
+  text-align: center;
+  flex: 0 0 auto;
+  font-size: 1.5rem;
+  padding: 8px;
+  border-radius: 50%;
+  color: rgba(0, 0, 0, 0.54);
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dior-grid .wishlist-icon-btn svg {
+  user-select: none;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.5rem;
+  color: rgb(51, 56, 60);
+}
+
+/* Product info section */
+.dior-grid .product-card-info {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 0px) {
+  .dior-grid .product-card-info {
+    min-height: 80px;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid .product-card-info {
+    min-height: 80px;
+  }
+}
+
+/* Info wrapper */
+.dior-grid .info-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  position: relative;
+}
+
+/* Title + description container */
+.dior-grid .title-desc-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  position: relative;
+  width: 100%;
+}
+@media (min-width: 600px) {
+  .dior-grid .title-desc-container {
+    max-width: 360px;
+  }
+}
+@media (min-width: 0px) {
+  .dior-grid .title-desc-container {
+    height: auto;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid .title-desc-container {
+    height: 100%;
+  }
+}
+
+/* Title wrapper */
+.dior-grid .title-wrapper {
+  text-align: center;
+  width: 100%;
+}
+.dior-grid .title-wrapper span {
+  margin: 0;
+  font-weight: 500;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 17px;
+  letter-spacing: 0.02em;
+  font-size: 0.875rem;
+  color: #33383C;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Description wrapper — hidden by default, revealed on hover */
+.dior-grid .description-wrapper {
+  text-align: center;
+  width: 100%;
+  position: relative;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  transition-delay: 0s;
+}
+.dior-grid .DS-Card:hover .description-wrapper,
+.dior-grid .DS-Card:focus .description-wrapper,
+.dior-grid .DS-Card:focus-within .description-wrapper {
+  opacity: 1;
+  max-height: 48px;
+  margin-top: 6px;
+}
+.dior-grid .description-wrapper span {
+  margin: 0;
+  font-weight: 400;
+  font-family: Hellix, ABCDiorIcons, arial, sans-serif;
+  line-height: 17px;
+  letter-spacing: normal;
+  font-size: 0.875rem;
+  color: #7B8487FF;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Legend wrapper — positioned below title, shifts on hover */
+.dior-grid .legend-wrapper {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  box-sizing: border-box;
+  position: relative;
+  margin-top: 8px;
+  transition: margin-top 0.3s ease;
+}
+@media (min-width: 1033px) {
+  .dior-grid .legend-wrapper {
+    margin-top: 10px;
+  }
+}
+
+/* Legend content */
+.dior-grid .legend-content {
+  position: relative;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+}
+
+/* Price */
+.dior-grid .card-legend-price {
+  margin: 0;
+  font-weight: 400;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 17px;
+  letter-spacing: 0.02em;
+  font-size: 0.875rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  color: #7B8487;
+}
+
+/* Colors wrapper */
+.dior-grid .colors-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  position: relative;
+}
+.dior-grid .colors-wrapper ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.dior-grid .colors-wrapper li {
+  margin-right: 4px;
+  padding: 2px;
+}
+.dior-grid .colors-wrapper li:last-child {
+  margin-right: 0;
+}
+.dior-grid .color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  box-sizing: content-box;
+  transition: border-color 0.2s ease;
+}
+.dior-grid .color-dot:hover {
+  border-color: #33383c;
+}
+.dior-grid .color-dot-selected {
+  border-color: #33383c;
+}
+
+/* Carousel pagination indicator (thin lines) */
+.dior-grid .carousel-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 0 8px;
+}
+.dior-grid .carousel-pagination .pagination-line {
+  flex: 1;
+  max-width: 24px;
+  height: 2px;
+  border-radius: 1px;
+  transition: background 0.3s ease;
+}
+@media (max-width: 1032px) {
+  .dior-grid .carousel-pagination .pagination-line {
+    background: rgba(0,0,0,0.35);
+  }
+  .dior-grid .carousel-pagination .pagination-line.active {
+    background: #000;
+  }
+}
+@media (min-width: 1033px) {
+  .dior-grid .carousel-pagination .pagination-line {
+    background: rgba(255,255,255,0.5);
+  }
+  .dior-grid .carousel-pagination .pagination-line.active {
+    background: #fff;
+  }
+}
+
+/* ═══ Product Detail Gallery ═══ */
+

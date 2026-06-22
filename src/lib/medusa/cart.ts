@@ -1,0 +1,88 @@
+import sdk from "./client"
+
+async function getDefaultRegionId(): Promise<string | undefined> {
+  try {
+    const { regions } = await sdk.store.region.list({ limit: "10" } as any)
+    if (!regions?.length) return undefined
+    const gbp = regions.find((r: any) => r.currency_code?.toLowerCase() === "gbp")
+    return gbp?.id ?? regions[0].id
+  } catch {
+    return undefined
+  }
+}
+
+let cachedRegionId: string | undefined
+
+export async function createCart(regionId?: string) {
+  try {
+    const id = regionId || cachedRegionId || await getDefaultRegionId()
+    if (id) cachedRegionId = id
+    const { cart } = await sdk.store.cart.create({
+      region_id: id,
+    })
+    return cart.id
+  } catch (error) {
+    console.error("Error creating cart in Medusa:", error)
+    throw new Error("Failed to create cart")
+  }
+}
+
+export async function getCart(cartId: string) {
+  try {
+    const { cart } = await sdk.store.cart.retrieve(cartId, {
+      fields: "*,items.variant.*,items.variant.options.*"
+    } as any)
+    return cart
+  } catch (error) {
+    console.error("Error fetching cart from Medusa:", error)
+    return null
+  }
+}
+
+export async function addToCart(
+  cartId: string,
+  variantId: string,
+  quantity: number
+) {
+  try {
+    const { cart } = await sdk.store.cart.createLineItem(cartId, {
+      variant_id: variantId,
+      quantity,
+    })
+    return cart
+  } catch (error) {
+    console.error("Error adding item to cart in Medusa:", error)
+    throw new Error("Failed to add item to cart")
+  }
+}
+
+export async function updateCartItem(
+  cartId: string,
+  lineItemId: string,
+  quantity: number
+) {
+  try {
+    const { cart } = await sdk.store.cart.updateLineItem(
+      cartId,
+      lineItemId,
+      { quantity }
+    )
+    return cart
+  } catch (error) {
+    console.error("Error updating cart item in Medusa:", error)
+    throw new Error("Failed to update cart item")
+  }
+}
+
+export async function removeFromCart(cartId: string, lineItemId: string) {
+  try {
+    const { parent: cart } = await sdk.store.cart.deleteLineItem(
+      cartId,
+      lineItemId
+    )
+    return cart
+  } catch (error) {
+    console.error("Error removing item from cart in Medusa:", error)
+    throw new Error("Failed to remove item from cart")
+  }
+}

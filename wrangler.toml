@@ -1,0 +1,6 @@
+name = "mavire-website"
+main = "src/index.js"
+compatibility_date = "2024-02-18"
+
+[env.production.vars]
+CLOUDFLARE_ACCOUNT_ID = "30a9ac5ae4015c2a629488fe19c5baa1"

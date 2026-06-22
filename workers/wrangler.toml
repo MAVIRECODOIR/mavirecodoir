@@ -1,0 +1,13 @@
+name = "mavire-r2-upload-worker"
+main = "r2-upload-worker.js"
+compatibility_date = "2024-01-01"
+
+# Bind R2 bucket to the Worker
+[[r2_buckets]]
+binding = "MAVIRE_ASSETS"
+bucket_name = "mavire-assets"
+
+# Environment variables
+[vars]
+# These will be set during deployment
+# R2_WORKER_URL = "https://mavire-r2-upload-worker.workers.dev"
