@@ -910,7 +910,6 @@ function CheckoutContent() {
                   <div style={{ border: "1px solid #E5E5E5", borderRadius: "4px" }}>
                     <div
                       className="ident-row"
-                      className="ident-row"
                       style={{ display: "flex", alignItems: "center", gap: "12px", padding: "20px 24px", cursor: "pointer" }}
                       onClick={() => { setIdentOption("login"); setForgotPasswordMode(false); setForgotStep("email"); setForgotCode(""); setForgotNewPassword(""); setForgotConfirmPassword(""); setForgotError(null); }}
                     >
