@@ -2,15 +2,17 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+
 type PayPalButtonProps = {
-  orderId: string
+  cartId: string
   onApprove: () => Promise<void>
   onError?: (err: unknown) => void
   disabled?: boolean
   sdkReady?: boolean
 }
 
-export default function PayPalButton({ orderId, onApprove, onError, disabled, sdkReady }: PayPalButtonProps) {
+export default function PayPalButton({ cartId, onApprove, onError, disabled, sdkReady }: PayPalButtonProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [loaded, setLoaded] = useState(false)
   const [sdkLoading, setSdkLoading] = useState(true)
@@ -18,10 +20,10 @@ export default function PayPalButton({ orderId, onApprove, onError, disabled, sd
   const buttonsRef = useRef<any>(null)
   const onApproveRef = useRef(onApprove)
   const onErrorRef = useRef(onError)
-  const orderIdRef = useRef(orderId)
+  const cartIdRef = useRef(cartId)
   onApproveRef.current = onApprove
   onErrorRef.current = onError
-  orderIdRef.current = orderId
+  cartIdRef.current = cartId
 
   // Clear container before each render cycle to prevent duplicates
   const clearContainer = useCallback(() => {
@@ -44,9 +46,8 @@ export default function PayPalButton({ orderId, onApprove, onError, disabled, sd
       return
     }
 
-    if (document.getElementById("paypal-js-sdk") && window.paypal) {
-      setLoaded(true)
-      setSdkLoading(false)
+    // Script already loading (added by parent preload) — wait for sdkReady
+    if (document.getElementById("paypal-js-sdk")) {
       return
     }
 
@@ -59,14 +60,14 @@ export default function PayPalButton({ orderId, onApprove, onError, disabled, sd
       setSdkLoading(false)
     }
     script.onerror = () => {
-      setError("Failed to load PayPal SDK. Please check your network or disable ad blockers.")
+      setError("Failed to load PayPal SDK.")
       setSdkLoading(false)
     }
     document.head.appendChild(script)
 
     const timeout = setTimeout(() => {
       if (!window.paypal) {
-        setError("PayPal SDK timed out. Please refresh and try again.")
+        setError("PayPal SDK timed out.")
         setSdkLoading(false)
       }
     }, 30000)
@@ -94,14 +95,37 @@ export default function PayPalButton({ orderId, onApprove, onError, disabled, sd
         label: "paypal",
         tagline: false,
       },
-      createOrder() {
-        return orderIdRef.current
+      async createOrder() {
+        const res = await fetch(`${BACKEND_URL}/store/paypal/create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cart_id: cartIdRef.current }),
+          credentials: "include",
+        })
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}))
+          throw new Error(errData.message || "Failed to create PayPal order")
+        }
+        const data = await res.json()
+        return data.id
       },
-      onApprove() {
-        onApproveRef.current().catch((err: unknown) => {
+      async onApprove(data: Record<string, unknown>) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/store/paypal/capture-order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cart_id: cartIdRef.current, order_id: data.orderID as string }),
+            credentials: "include",
+          })
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}))
+            throw new Error(errData.message || "Failed to capture PayPal order")
+          }
+          await onApproveRef.current()
+        } catch (err: unknown) {
           console.error("PayPal onApprove error:", err)
           onErrorRef.current?.(err)
-        })
+        }
       },
       onError(err: unknown) {
         console.error("PayPal error:", err)
@@ -115,9 +139,9 @@ export default function PayPalButton({ orderId, onApprove, onError, disabled, sd
       setError("Failed to render PayPal button.")
     })
 
-    // Only re-render when orderId actually changes
+    // Only re-render when cartId actually changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, orderId])
+  }, [loaded, cartId])
 
   if (error) {
     return (

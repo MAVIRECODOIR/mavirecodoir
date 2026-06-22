@@ -87,7 +87,6 @@ function CheckoutContent() {
   const [address, setAddress] = useState<AddressForm>(initialAddress)
   const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null)
   const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null)
-  const [orderId, setOrderId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [shippingOptions, setShippingOptions] = useState<any[]>([])
   const [selectedShipping, setSelectedShipping] = useState<string>("")
@@ -564,8 +563,8 @@ function CheckoutContent() {
       const result = await sessionFn(cartId)
       const collection = (result as any)?.payment_collection ?? result
       const session = collection?.payment_sessions?.[0]
-      if (provider === "paypal" && session?.data?.id) {
-        setPaypalOrderId(session.data.id)
+      if (provider === "paypal") {
+        setPaypalOrderId(session?.id || "ready")
       } else if (provider === "stripe" && session?.data?.client_secret) {
         setStripeClientSecret(session.data.client_secret)
       }
@@ -638,26 +637,6 @@ function CheckoutContent() {
 
   if (loading) {
     return <CheckoutSkeleton />
-  }
-
-  if (step === "complete" && orderId) {
-    return (
-      <div className="mx-auto w-full max-w-[600px] px-4 py-12 md:py-16 text-center">
-        <h1 className="text-[24px] md:text-[32px] font-normal m-0 text-[#33383C]" style={{ fontFamily: '"Atacama VAR", ABCDiorIcons, arial, sans-serif', lineHeight: "37px" }}>Order Placed</h1>
-        <p className="text-[14px] mt-2 m-0 text-[#7B8487]" style={{ fontFamily: "Hellix, ABCDiorIcons, arial, sans-serif", lineHeight: "17px" }}>
-          Thank you for your order! Your order number is <span className="font-medium text-[#33383C]">{orderId}</span>.
-        </p>
-        <p className="text-[13px] mt-2 m-0 text-[#7B8487]" style={{ fontFamily: "Hellix, ABCDiorIcons, arial, sans-serif", lineHeight: "17px" }}>You will receive a confirmation email shortly.</p>
-        <button
-          type="button"
-          onClick={() => router.push("/")}
-          className="mt-8 w-full max-w-[450px] h-12 inline-flex items-center justify-center bg-[#33383C] text-white text-[14px] font-medium rounded-sm hover:bg-neutral-700 transition-colors"
-          style={{ fontFamily: "Hellix, ABCDiorIcons, arial, sans-serif" }}
-        >
-          Continue Shopping
-        </button>
-      </div>
-    )
   }
 
   const subtotal = cart?.subtotal || 0
@@ -2190,7 +2169,7 @@ function CheckoutContent() {
                           }}>
                             {paymentProvider === "paypal" && paypalOrderId ? (
                               <PayPalButton
-                                 orderId={paypalOrderId}
+                                 cartId={cartId}
                                  onApprove={handlePaymentComplete}
                                  onError={() => setPaymentError("PayPal encountered an error.")}
                                  sdkReady={paypalSdkReady}
