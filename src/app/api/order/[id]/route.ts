@@ -17,9 +17,13 @@ export async function GET(
   try {
     const url = `${MEDUSA_BACKEND_URL}/custom/order/${encodeURIComponent(id)}${token ? `?token=${encodeURIComponent(token)}` : ""}`
 
+    const cookies = req.headers.get("cookie") || ""
+    const mavireToken = cookies.split(";").find(c => c.trim().startsWith("mavire_token="))?.split("=").slice(1).join("=") || ""
+
     const res = await fetch(url, {
       headers: {
-        cookie: req.headers.get("cookie") || "",
+        cookie: cookies,
+        ...(mavireToken ? { authorization: `Bearer ${mavireToken}` } : {}),
       },
       next: { revalidate: 0 },
     })
