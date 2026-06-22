@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useCallback } from "react"
+import { useEffect, useState, useRef, Suspense, useCallback } from "react"
 import { useParams, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import CheckoutShell from "@/components/checkout/CheckoutShell"
@@ -205,11 +205,13 @@ function OrderContent() {
   const [order, setOrder] = useState<OrderDisplay | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const pollRef = useRef(false)
 
-  const fetchOrder = useCallback(async () => {
+  const fetchOrder = useCallback(async (showLoading?: boolean) => {
     if (!orderId) return
     const url = `/api/order/${encodeURIComponent(orderId)}${token ? `?token=${encodeURIComponent(token)}` : ""}`
     try {
+      if (showLoading) setLoading(true)
       const res = await fetch(url, { credentials: "include" })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
@@ -220,23 +222,25 @@ function OrderContent() {
       setError(null)
     } catch (err: unknown) {
       if (!order) setError(err instanceof Error ? err.message : "Failed to load order")
+    } finally {
+      if (showLoading) setLoading(false)
     }
-  }, [orderId, token, order])
+  }, [orderId, token])
 
   useEffect(() => {
-    setLoading(true)
-    fetchOrder().finally(() => setLoading(false))
+    fetchOrder(true)
   }, [fetchOrder])
 
   useEffect(() => {
-    if (!order || loading) return
+    if (!order || loading || pollRef.current) return
     const ps = order.payment_status || ""
     const fs = order.fulfillment_status || ""
     const isFinal = ps === "captured" || ps === "refunded" || ps === "canceled" || fs === "delivered" || fs === "shipped"
     if (isFinal) return
-    const interval = setInterval(fetchOrder, 30000)
-    return () => clearInterval(interval)
-  }, [order, loading, fetchOrder])
+    pollRef.current = true
+    const interval = setInterval(() => fetchOrder(false), 30000)
+    return () => { clearInterval(interval); pollRef.current = false }
+  }, [order, loading])
 
   if (loading) {
     return (

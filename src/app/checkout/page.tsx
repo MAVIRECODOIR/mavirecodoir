@@ -15,6 +15,7 @@ import { getCart } from "../../lib/medusa/cart"
 import { getShippingOptions, setShippingMethod, initiatePayPalSession, initiateStripeSession, completeCart } from "../../lib/medusa/checkout"
 import { isValidPhoneNumber } from "libphonenumber-js"
 import { formatPrice, formatPriceFree } from "@/lib/utils/format"
+import { useCart } from "@/lib/medusa/cart-context"
 
 function AccordionPanel({ open, children }: { open: boolean; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -79,7 +80,9 @@ type IdentOption = "login" | "create" | "guest"
 function CheckoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const cartId = searchParams?.get("cart_id") ?? null
+  const { cartId: contextCartId } = useCart()
+  const urlCartId = searchParams?.get("cart_id") ?? null
+  const cartId = contextCartId || urlCartId
 
   const [cart, setCart] = useState<CartData | null>(null)
   const [loading, setLoading] = useState(true)

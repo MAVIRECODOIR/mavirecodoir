@@ -103,7 +103,7 @@ export default function CartRoute() {
         await sdk.store.cart.update(cartId, { metadata })
       }
     } catch {}
-    router.push(`/checkout?cart_id=${cartId}`);
+    router.push("/checkout");
   };
 
   const currency = cart?.region?.currency_code?.toUpperCase() || "GBP";

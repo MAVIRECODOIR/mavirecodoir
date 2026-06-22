@@ -226,7 +226,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     try {
       const cartId = await ensureCart();
       await addToCart(cartId, selectedVariantId, 1);
-      router.push(`/checkout?cart_id=${cartId}`);
+      router.push("/checkout");
     } catch {
       alert("Failed to start checkout.");
     } finally {

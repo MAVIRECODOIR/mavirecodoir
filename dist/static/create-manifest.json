@@ -1,0 +1,21 @@
+{
+  "createdAt": "2026-06-22T22:42:31.183Z",
+  "studioVersion": "6.1.0",
+  "version": 3,
+  "workspaces": [
+    {
+      "basePath": "/admin/studio",
+      "dataset": "production",
+      "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><rect width=\"32\" height=\"32\" rx=\"2\" fill=\"#e72767\"></rect><text x=\"50%\" y=\"50%\" text-anchor=\"middle\" alignment-baseline=\"middle\" fill=\"hsla(340, 80%, 13%, 1)\" style=\"font-family:Inter, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, &quot;Helvetica Neue&quot;, &quot;Liberation Sans&quot;, Helvetica, Arial, system-ui, sans-serif;font-weight:500;font-size:13px;transform:translateY(1px)\">MC</text></svg>",
+      "mediaLibrary": {
+        "enabled": false,
+        "__internal": {}
+      },
+      "name": "mavire",
+      "projectId": "6bkvaal8",
+      "schema": "3f1bc944.create-schema.json",
+      "title": "MAVIRE CODOIR",
+      "tools": "ef87c8fe.create-tools.json"
+    }
+  ]
+}

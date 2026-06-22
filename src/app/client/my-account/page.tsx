@@ -482,7 +482,7 @@ export default function MyAccountPage() {
 
           {/* ═══ TRACK ORDER SECTION ═══ */}
           {activeSection === "track" && (
-            <TrackOrderSection />
+            <TrackOrderSection orders={orders} onGoToOrders={() => setActiveSection("orders")} />
           )}
 
           {/* ═══ RETURNS SECTION ═══ */}
@@ -636,138 +636,172 @@ export default function MyAccountPage() {
 }
 
 /* ═══ TRACK ORDER COMPONENT ═══ */
-function TrackOrderSection() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [foundOrder, setFoundOrder] = useState<{
+type FulfillmentInfo = {
+  id: string;
+  tracking_links?: Array<{
     id: string;
-    display_id: number;
-    total: number;
-    currency_code: string;
-    created_at: string;
-    fulfillment_status: string;
-    payment_status: string;
-    token: string;
-  } | null>(null);
+    tracking_number: string;
+    url: string;
+    provider_id: string;
+  }>;
+};
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email || !orderNumber) return;
-    setLoading(true);
-    setError(null);
-    setFoundOrder(null);
-    try {
-      const res = await fetch(
-        `/api/track-order?display_id=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}`
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Order not found. Check your details and try again.");
-      } else {
-        setFoundOrder({ ...data.order, token: data.token });
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
+type OrderDetail = OrderItem & {
+  fulfillments?: FulfillmentInfo[];
+  shipping_address?: {
+    first_name: string;
+    last_name: string;
+    address_1: string;
+    city: string;
+    postal_code: string;
+    country_code: string;
+  };
+  shipping_methods?: Array<{
+    name: string;
+    amount: number;
+  }>;
+};
+
+function TrackOrderSection({ orders, onGoToOrders }: { orders: OrderItem[]; onGoToOrders: () => void }) {
+  const router = useRouter();
+  const [trackingOrders, setTrackingOrders] = useState<OrderDetail[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const trackableStatuses = [
+    "shipped", "partially_shipped",
+    "fulfilled", "partially_fulfilled",
+    "delivered", "partially_delivered",
+  ];
+
+  useEffect(() => {
+    const trackable = orders.filter((o) =>
+      trackableStatuses.includes(o.fulfillment_status)
+    );
+    if (trackable.length === 0) {
+      setTrackingOrders([]);
       setLoading(false);
+      return;
     }
-  }
+    setLoading(true);
+    Promise.all(
+      trackable.map((o) =>
+        fetch(`/api/order/${o.id}`, { credentials: "include" })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d) => d?.order || d || null)
+          .catch(() => null)
+      )
+    )
+      .then((results) => setTrackingOrders(results.filter(Boolean)))
+      .finally(() => setLoading(false));
+  }, [orders]);
 
   return (
     <div className="max-w-[840px] mx-auto px-4 py-10 md:py-16">
       <h1 className="text-base font-medium tracking-wide mb-1">Track your order</h1>
       <p className="text-xs text-black/60 mb-8">
-        Enter your email address and order number to check your order status.
+        Track all your shipped orders in one place. Tracking numbers and carriers are listed below.
       </p>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4">
-          <div>
-            <label className="block text-[11px] text-black/50 uppercase tracking-wider mb-1">Email address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] text-black/50 uppercase tracking-wider mb-1">Order number</label>
-            <input
-              type="text"
-              value={orderNumber}
-              onChange={(e) => setOrderNumber(e.target.value.replace(/\D/g, ""))}
-              placeholder="e.g. 1234"
-              required
-              className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black transition-colors"
-            />
-          </div>
-          <div className="self-end">
+      {loading ? (
+        <div className="bg-white text-center py-12">
+          <div className="inline-block w-6 h-6 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+        </div>
+      ) : trackingOrders.length === 0 ? (
+        <div className="bg-white text-center py-12 px-6 border border-gray-200">
+          <Truck size={32} strokeWidth={1} className="mx-auto mb-4 text-black/30" />
+          <p className="text-sm text-black/80 font-medium mb-1">No items to track yet</p>
+          <p className="text-xs text-black/50 mb-6 max-w-sm mx-auto">
+            Once your order has been shipped, tracking details will appear here.
+            Check your{" "}
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full md:w-auto bg-black text-white text-xs font-medium uppercase tracking-wider px-8 py-2 hover:bg-black/85 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              onClick={onGoToOrders}
+              className="text-black underline hover:no-underline inline bg-transparent border-0 p-0 cursor-pointer"
             >
-              {loading ? (
-                <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Search size={14} />
-                  Track
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </form>
-
-      {error && (
-        <div className="bg-red-50 border border-red-100 p-6 text-center">
-          <Truck size={24} strokeWidth={1} className="mx-auto mb-2 text-red-300" />
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
-
-      {foundOrder && (
-        <div className="bg-white border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-xs text-green-600 font-medium mb-1">Order found</p>
-              <h2 className="text-base font-medium">Order #{foundOrder.display_id}</h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {new Intl.DateTimeFormat("en-GB", { dateStyle: "long" }).format(new Date(foundOrder.created_at))}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-medium">
-                {new Intl.NumberFormat("en-GB", {
-                  style: "currency",
-                  currency: (foundOrder.currency_code || "gbp").toUpperCase(),
-                }).format((foundOrder.total || 0) / 100)}
-              </p>
-              <p className="text-[11px] text-gray-500 capitalize">{foundOrder.fulfillment_status.replace(/_/g, " ")}</p>
-            </div>
-          </div>
+              order history
+            </button>{" "}
+            to see all your purchases.
+          </p>
           <button
-            onClick={() => router.push(`/order/${foundOrder.id}?token=${foundOrder.token}`)}
-            className="w-full bg-black text-white text-xs font-medium uppercase tracking-wider py-3 hover:bg-black/85 transition-colors flex items-center justify-center gap-2"
+            onClick={onGoToOrders}
+            className="inline-block bg-black text-white text-xs font-medium uppercase tracking-wider px-8 py-3 hover:bg-black/85 transition-colors"
           >
-            View full order details <ChevronRight size={14} />
+            View order history
           </button>
         </div>
-      )}
+      ) : (
+        <div className="space-y-4">
+          {trackingOrders.map((order) => {
+            const fulfillments = order.fulfillments || [];
+            const allLinks = fulfillments.flatMap((f) => f.tracking_links || []);
+            const firstItem = order.items?.[0];
+            return (
+              <div key={order.id} className="bg-white border border-gray-200">
+                <div className="flex items-center gap-4 p-4 border-b border-gray-100">
+                  <div className="w-[52px] h-[65px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    {firstItem?.thumbnail ? (
+                      <img
+                        src={firstItem.thumbnail}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-400 mb-0.5">Order #{order.display_id}</p>
+                    <p className="text-sm font-medium truncate">
+                      {firstItem?.variant?.product?.title || firstItem?.title || `Order #${order.display_id}`}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${
+                        order.fulfillment_status === "delivered" || order.fulfillment_status === "partially_delivered"
+                          ? "bg-green-50 text-green-700"
+                          : "bg-blue-50 text-blue-700"
+                      }`}>
+                        {order.fulfillment_status.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                </div>
 
-      {!foundOrder && !error && (
-        <div className="bg-white text-center py-12 px-6">
-          <Search size={32} strokeWidth={1} className="mx-auto mb-4 text-black/30" />
-          <p className="text-sm text-black/50">
-            Enter your email and order number above to check the status of your order.
-          </p>
+                {allLinks.length > 0 && (
+                  <div className="px-4 py-3 space-y-2">
+                    {allLinks.map((link) => (
+                      <div key={link.id} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-black/50 uppercase tracking-wider text-[10px] shrink-0">
+                            {link.provider_id?.replace(/_/g, " ") || "Carrier"}:
+                          </span>
+                          <span className="font-medium truncate">{link.tracking_number}</span>
+                        </div>
+                        {link.url && (
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-black underline hover:no-underline shrink-0 ml-2"
+                          >
+                            Track
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="border-t border-gray-100 px-4 py-3">
+                  <button
+                    onClick={() => router.push(`/order/${order.id}`)}
+                    className="w-full bg-black text-white text-[11px] font-medium uppercase tracking-wider py-2.5 hover:bg-black/85 transition-colors"
+                  >
+                    View order details
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
