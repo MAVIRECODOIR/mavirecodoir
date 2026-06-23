@@ -117,7 +117,7 @@ function StatusTimeline({ paymentStatus, fulfillmentStatus, createdAt }: {
 
   const getStep = (s: string, type: "payment" | "fulfillment"): number => {
     if (type === "payment") {
-      const m: Record<string, number> = { pending: 0, requires_action: 0, not_paid: 0, awaiting: 1, captured: 1, partially_refunded: 2, refunded: 2 }
+      const m: Record<string, number> = { pending: 0, requires_action: 0, not_paid: 0, awaiting: 1, captured: 1, authorized: 1, paid: 1, partially_refunded: 2, refunded: 2 }
       return m[s] ?? 0
     }
     const m: Record<string, number> = { not_fulfilled: 0, partially_fulfilled: 1, fulfilled: 1, partially_shipped: 1, shipped: 2, partially_delivered: 2, delivered: 3 }
@@ -286,7 +286,7 @@ function OrderContent() {
     if (!order || loading || pollRef.current) return
     const ps = order.payment_status || ""
     const fs = order.fulfillment_status || ""
-    const isFinal = ps === "captured" || ps === "refunded" || ps === "canceled" || fs === "delivered" || fs === "shipped"
+    const isFinal = ps === "captured" || ps === "paid" || ps === "refunded" || ps === "canceled" || fs === "delivered" || fs === "shipped"
     if (isFinal) return
     pollRef.current = true
     const interval = setInterval(() => fetchOrder(false), 30000)
