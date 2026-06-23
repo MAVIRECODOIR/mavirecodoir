@@ -72,17 +72,20 @@ async function fetchWithInv<T>(fn: (salesChannelId?: string) => Promise<T>): Pro
   return null;
 }
 
-export async function getProducts() {
+export async function getProducts(regionId?: string) {
   const result = await fetchWithInv(async (salesChannelId) => {
     const params: any = { fields: PRODUCT_FIELDS };
     if (salesChannelId) params.sales_channel_id = [salesChannelId];
+    if (regionId) params.region_id = regionId;
     const { products } = await sdk.store.product.list(params);
     return products;
   });
   if (result) return result;
 
   try {
-    const { products } = await sdk.store.product.list({ fields: PRODUCT_FIELDS_NO_INV });
+    const params: any = { fields: PRODUCT_FIELDS_NO_INV };
+    if (regionId) params.region_id = regionId;
+    const { products } = await sdk.store.product.list(params);
     return products;
   } catch (error) {
     console.error("Error fetching products from Medusa:", error);
@@ -90,17 +93,20 @@ export async function getProducts() {
   }
 }
 
-export async function getProductByHandle(handle: string) {
+export async function getProductByHandle(handle: string, regionId?: string) {
   const result = await fetchWithInv(async (salesChannelId) => {
     const params: any = { handle, fields: PRODUCT_FIELDS };
     if (salesChannelId) params.sales_channel_id = [salesChannelId];
+    if (regionId) params.region_id = regionId;
     const { products } = await sdk.store.product.list(params);
     return products[0] || null;
   });
   if (result !== null) return result;
 
   try {
-    const { products } = await sdk.store.product.list({ handle, fields: PRODUCT_FIELDS_NO_INV });
+    const params: any = { handle, fields: PRODUCT_FIELDS_NO_INV };
+    if (regionId) params.region_id = regionId;
+    const { products } = await sdk.store.product.list(params);
     return products[0] || null;
   } catch (error) {
     console.error("Error fetching product from Medusa:", error);
@@ -108,20 +114,23 @@ export async function getProductByHandle(handle: string) {
   }
 }
 
-export async function getProductsByCollection(collectionId: string) {
+export async function getProductsByCollection(collectionId: string, regionId?: string) {
   const result = await fetchWithInv(async (salesChannelId) => {
     const params: any = { collection_id: [collectionId], fields: PRODUCT_FIELDS };
     if (salesChannelId) params.sales_channel_id = [salesChannelId];
+    if (regionId) params.region_id = regionId;
     const { products } = await sdk.store.product.list(params);
     return products;
   });
   if (result) return result;
 
   try {
-    const { products } = await sdk.store.product.list({
+    const params: any = {
       collection_id: [collectionId],
       fields: PRODUCT_FIELDS_NO_INV,
-    });
+    };
+    if (regionId) params.region_id = regionId;
+    const { products } = await sdk.store.product.list(params);
     return products;
   } catch (error) {
     console.error("Error fetching products by collection from Medusa:", error);
@@ -129,17 +138,20 @@ export async function getProductsByCollection(collectionId: string) {
   }
 }
 
-export async function getProductsByTag(tag: string) {
+export async function getProductsByTag(tag: string, regionId?: string) {
   const result = await fetchWithInv(async (salesChannelId) => {
     const params: any = { fields: PRODUCT_FIELDS };
     if (salesChannelId) params.sales_channel_id = [salesChannelId];
+    if (regionId) params.region_id = regionId;
     const { products } = await sdk.store.product.list(params);
     return products.filter((p: any) => p.tags?.some((t: any) => t.value === tag));
   });
   if (result) return result;
 
   try {
-    const { products } = await sdk.store.product.list({ fields: PRODUCT_FIELDS_NO_INV });
+    const params: any = { fields: PRODUCT_FIELDS_NO_INV };
+    if (regionId) params.region_id = regionId;
+    const { products } = await sdk.store.product.list(params);
     return products.filter((p: any) => p.tags?.some((t: any) => t.value === tag));
   } catch (error) {
     console.error("Error fetching products by tag from Medusa:", error);

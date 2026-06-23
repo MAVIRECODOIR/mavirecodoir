@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProducts, getCollectionByHandle, getProductsByCollection } from "../../../lib/medusa/products";
+import { getRegionId } from "@/lib/region";
 import FilterSortDrawer from "../../men/new/FilterSortDrawer";
 import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";
 
@@ -40,6 +41,7 @@ function extractFiltersFromProducts(products: any[]) {
 export default async function CollectionPage({ params, searchParams }: { params: Promise<{ gender: string; subcategory?: string[] }>; searchParams?: Promise<{ sort?: string }> }) {
   const resolvedParams = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const regionId = await getRegionId();
 
   const gender = resolvedParams.gender?.toLowerCase();
   const subcategoryParts = (resolvedParams.subcategory || [])
@@ -66,12 +68,12 @@ export default async function CollectionPage({ params, searchParams }: { params:
   try {
     const collection = await getCollectionByHandle(handle);
     if (collection) {
-      products = await getProductsByCollection(collection.id);
+      products = await getProductsByCollection(collection.id, regionId);
       collectionTitle = collection.title || handle;
       collectionDescription = (collection as any).metadata?.description || "";
     }
     if (!products.length) {
-      products = await getProducts();
+      products = await getProducts(regionId);
       products = products.filter((p: any) =>
         p.tags?.some((tag: any) => tag.value?.toLowerCase() === gender)
       );
@@ -79,8 +81,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
     }
   } catch (error) {
     console.error("Error fetching collection:", error);
-    products = await getProducts();
-    collectionTitle = gender.charAt(0).toUpperCase() + gender.slice(1);
+    products = await getProducts(regionId);
   }
 
   // Apply sorting

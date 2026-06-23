@@ -1,4 +1,5 @@
 import { getProducts, getCollectionByHandle, getProductsByCollection } from "../../../lib/medusa/products";
+import { getRegionId } from "@/lib/region";
 import FilterSortDrawer from "./FilterSortDrawer";
 import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";
 
@@ -48,6 +49,7 @@ function extractFiltersFromProducts(products: any[]) {
 export default async function MenNewPage({ searchParams }: { searchParams?: Promise<{ sort?: string }> }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { sortKey, reverse } = resolveSort(resolvedSearchParams?.sort);
+  const regionId = await getRegionId();
 
   // Try to fetch products from Medusa collection first
   let products = [];
@@ -57,19 +59,19 @@ export default async function MenNewPage({ searchParams }: { searchParams?: Prom
   try {
     const collection = await getCollectionByHandle("men-new");
     if (collection) {
-      products = await getProductsByCollection(collection.id);
+      products = await getProductsByCollection(collection.id, regionId);
       collectionTitle = collection.title || "New Arrivals";
       collectionDescription = (collection as any).metadata?.description || collectionDescription;
     }
     if (!products.length) {
-      products = await getProducts();
+      products = await getProducts(regionId);
       products = products.filter((p: any) =>
         p.tags?.some((tag: any) => tag.value?.toLowerCase() === "new")
       );
     }
   } catch (error) {
     console.error("Error fetching men new arrivals:", error);
-    products = await getProducts();
+    products = await getProducts(regionId);
   }
 
   // Apply sorting

@@ -71,11 +71,8 @@ interface OrderDisplay {
 function formatPrice(amount: number, currency?: string) {
   if (isNaN(amount) || amount == null) return "£0.00"
   const code = (currency || "gbp").toUpperCase()
-  // Check if amount is in cents (integer and >= 1) or already in decimal format
-  // If it's an integer and >= 1, assume it's in cents and divide by 100
-  // Otherwise, assume it's already in decimal format
-  const normalizedAmount = Number.isInteger(amount) && amount >= 1 ? amount / 100 : amount
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: code, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(normalizedAmount)
+  // Medusa v2 stores prices as the actual decimal amount (not in cents)
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency: code, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
 }
 
 function formatDate(dateStr?: string) {

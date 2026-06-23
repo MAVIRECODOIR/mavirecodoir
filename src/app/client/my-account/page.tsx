@@ -387,7 +387,7 @@ export default function MyAccountPage() {
                                         {new Intl.NumberFormat("en-GB", {
                                           style: "currency",
                                           currency: (o.currency_code || "gbp").toUpperCase(),
-                                        }).format((item.unit_price || 0) / 100)}
+                                        }).format(item.unit_price || 0)}
                                       </span>
                                     </div>
                                   ))}
@@ -398,7 +398,7 @@ export default function MyAccountPage() {
                                     {new Intl.NumberFormat("en-GB", {
                                       style: "currency",
                                       currency: (o.currency_code || "gbp").toUpperCase(),
-                                    }).format((o.total || 0) / 100)}
+                                    }).format(o.total || 0)}
                                   </span>
                                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${
                                     o.fulfillment_status === "delivered"

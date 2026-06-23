@@ -1,4 +1,5 @@
 import { getProducts } from "../../lib/medusa/products";
+import { getRegionId } from "@/lib/region";
 import FilterSortDrawer from "../men/new/FilterSortDrawer";
 import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";
 
@@ -80,10 +81,11 @@ function extractTagFilters(products: any[]) {
 export default async function NewArrivalsPage({ searchParams }: { searchParams?: Promise<{ sort?: string }> }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const { sortKey, reverse } = resolveSort(resolvedSearchParams?.sort);
+  const regionId = await getRegionId();
 
   let products: any[] = [];
   try {
-    products = await getProducts();
+    products = await getProducts(regionId);
     products = products.filter((p: any) =>
       p.tags?.some((t: any) => t.value?.toLowerCase() === "new")
     );

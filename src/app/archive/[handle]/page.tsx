@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCollectionByHandle, getProductsByCollection } from "../../../lib/medusa/products";
+import { getRegionId } from "@/lib/region";
 import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +9,7 @@ type MedusaProduct = ProductCardData & { options?: any[] };
 
 export default async function ArchiveCollectionPage({ params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params;
+  const regionId = await getRegionId();
 
   let collection: any;
   try {
@@ -20,7 +22,7 @@ export default async function ArchiveCollectionPage({ params }: { params: Promis
 
   let products: MedusaProduct[] = [];
   try {
-    products = (await getProductsByCollection(collection.id)) as MedusaProduct[];
+    products = (await getProductsByCollection(collection.id, regionId)) as MedusaProduct[];
   } catch {
     // Products optional
   }

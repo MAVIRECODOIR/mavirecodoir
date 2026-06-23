@@ -1,4 +1,5 @@
 import sdk from "./client"
+import Cookies from "js-cookie"
 
 async function getRegionIdByCurrency(currencyCode: string): Promise<string | undefined> {
   try {
@@ -27,15 +28,20 @@ let cachedRegionId: string | undefined
 export async function createCart(currencyCode?: string) {
   try {
     let id: string | undefined;
-    
-    if (currencyCode) {
+
+    // First try to get region_id from cookie (set by RegionProvider)
+    id = Cookies.get("region_id");
+
+    // If not in cookie, try by currency code
+    if (!id && currencyCode) {
       id = await getRegionIdByCurrency(currencyCode);
     }
-    
+
+    // If still no region, get default
     if (!id) {
       id = cachedRegionId || await getDefaultRegionId();
     }
-    
+
     if (id) cachedRegionId = id
     const { cart } = await sdk.store.cart.create({
       region_id: id,
