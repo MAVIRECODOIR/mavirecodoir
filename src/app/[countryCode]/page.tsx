@@ -1,12 +1,12 @@
 import { client } from "@/lib/sanity/client";
 import { journalPostsQuery } from "@/lib/sanity/queries";
 import { urlFor } from "@/lib/sanity/image";
-import HeroFullBleed from "../components/sections/HeroFullBleed";
-import FeaturedProducts from "../components/sections/FeaturedProducts";
-import CategorySplit from "../components/sections/CategorySplit";
-import EditorialBanner from "../components/sections/EditorialBanner";
-import JournalSection from "../components/sections/JournalSection";
-import ArchiveSection from "../components/sections/ArchiveSection";
+import HeroFullBleed from "../../components/sections/HeroFullBleed";
+import FeaturedProducts from "../../components/sections/FeaturedProducts";
+import CategorySplit from "../../components/sections/CategorySplit";
+import EditorialBanner from "../../components/sections/EditorialBanner";
+import JournalSection from "../../components/sections/JournalSection";
+import ArchiveSection from "../../components/sections/ArchiveSection";
 
 interface SanityPost {
   _id: string;
@@ -17,27 +17,29 @@ interface SanityPost {
   categories: Array<{ title: string }> | null;
 }
 
-async function getJournalEntries() {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  if (!projectId || projectId === "your-project-id") return null;
+export default async function HomePage({ params }: { params: Promise<{ countryCode: string }> }) {
+  const { countryCode } = await params;
+  
+  async function getJournalEntries() {
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+    if (!projectId || projectId === "your-project-id") return null;
 
-  try {
-    const posts: SanityPost[] = await client.fetch(journalPostsQuery);
-    return posts.slice(0, 3).map((post) => ({
-      title: post.title,
-      description: post.excerpt || "",
-      imageSrc: post.mainImage
-        ? urlFor(post.mainImage).width(800).height(600).url()
-        : "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85&auto=format",
-      href: `/journal/${post.slug.current}`,
-      category: post.categories?.[0]?.title || undefined,
-    }));
-  } catch {
-    return null;
+    try {
+      const posts: SanityPost[] = await client.fetch(journalPostsQuery);
+      return posts.slice(0, 3).map((post) => ({
+        title: post.title,
+        description: post.excerpt || "",
+        imageSrc: post.mainImage
+          ? urlFor(post.mainImage).width(800).height(600).url()
+          : "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85&auto=format",
+        href: `/${countryCode}/journal/${post.slug.current}`,
+        category: post.categories?.[0]?.title || undefined,
+      }));
+    } catch {
+      return null;
+    }
   }
-}
 
-export default async function HomePage() {
   const journalEntries = await getJournalEntries();
 
   const fallbackEntries = [
@@ -47,7 +49,7 @@ export default async function HomePage() {
         "On the urgency of returning to considered making, limited runs, and the stories that justify each stitch.",
       imageSrc:
         "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85&auto=format",
-      href: "/journal/slow-fashion",
+      href: `/${countryCode}/journal/slow-fashion`,
       category: "Craft",
     },
     {
@@ -56,7 +58,7 @@ export default async function HomePage() {
         "The Akan symbol that animates our approach to heritage — recovering what matters before reimagining it.",
       imageSrc:
         "https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&q=85&auto=format",
-      href: "/journal/sankofa",
+      href: `/${countryCode}/journal/sankofa`,
       category: "Philosophy",
     },
     {
@@ -65,7 +67,7 @@ export default async function HomePage() {
         "How Ghana's woven stories inform the textures, patterns, and intentionality of the collection.",
       imageSrc:
         "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=85&auto=format",
-      href: "/journal/kente",
+      href: `/${countryCode}/journal/kente`,
       category: "Textiles",
     },
   ];
@@ -76,7 +78,7 @@ export default async function HomePage() {
         imageSrc="https://cdn.mavirecodoir.com/brand/web-media/hero/gxGBTFS3NqzRZXXJyF039j1AQs.jpg"
         headline="Discover"
         ctaLabel="Our Story"
-        ctaHref="/about"
+        ctaHref={`/${countryCode}/about`}
         contentVariant="mavire"
         overlayColor="dark"
         textColor="white"
@@ -88,14 +90,14 @@ export default async function HomePage() {
       <CategorySplit
         left={{
           title: "Explore Women",
-          href: "/women",
+          href: `/${countryCode}/women`,
           imageSrc:
             "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&q=85&auto=format",
           imageAlt: "Women's collection",
         }}
         right={{
           title: "Explore Men",
-          href: "/men",
+          href: `/${countryCode}/men`,
           imageSrc:
             "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=85&auto=format",
           imageAlt: "Men's collection",
@@ -106,7 +108,7 @@ export default async function HomePage() {
         headline="World of MAVIRE"
         description="Japanese calm, Ghanaian soul — stories of craft, lineage, and modern luxury."
         ctaLabel="Discover More"
-        ctaHref="/about"
+        ctaHref={`/${countryCode}/about`}
         imageSrc="https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&q=85&auto=format"
         layout="full-bleed"
         textColor="white"
@@ -122,7 +124,7 @@ export default async function HomePage() {
               "The first numbered collection — a record of beginnings, material trials, and creative intent.",
             imageSrc:
               "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=85&auto=format",
-            href: "/archive/001",
+            href: `/${countryCode}/archive/001`,
             number: "001",
           },
           {
@@ -131,7 +133,7 @@ export default async function HomePage() {
               "Notes toward coming seasons: silhouettes in development, fabric research, and cultural reference points.",
             imageSrc:
               "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&q=85&auto=format",
-            href: "/collections/future",
+            href: `/${countryCode}/collections/future`,
             number: "002",
           },
           {
@@ -140,7 +142,7 @@ export default async function HomePage() {
               "A living archive of textiles — Japanese cottons, Ghanaian prints, and the joinery between them.",
             imageSrc:
               "https://images.unsplash.com/photo-1604176424472-9d7e2a423e1a?w=800&q=85&auto=format",
-            href: "/materials-library",
+            href: `/${countryCode}/materials-library`,
             number: "003",
           },
           {
@@ -149,7 +151,7 @@ export default async function HomePage() {
               "Essays, references, and marginalia on the intersections of Japanese and Ghanaian design philosophy.",
             imageSrc:
               "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=800&q=85&auto=format",
-            href: "/journal/cultural-notes",
+            href: `/${countryCode}/journal/cultural-notes`,
             number: "004",
           },
         ]}
