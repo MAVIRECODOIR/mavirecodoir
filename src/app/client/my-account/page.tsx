@@ -388,7 +388,7 @@ export default function MyAccountPage() {
                                         ? "bg-gray-100 text-gray-500"
                                         : "bg-amber-50 text-amber-700"
                                     }`}>
-                                      {o.fulfillment_status.replace(/_/g, " ")}
+                                      {(o.fulfillment_status || "").replace(/_/g, " ")}
                                     </span>
                                   </div>
                                 </div>
@@ -759,7 +759,7 @@ function TrackOrderSection({ orders, onGoToOrders }: { orders: OrderItem[]; onGo
                           ? "bg-green-50 text-green-700"
                           : "bg-blue-50 text-blue-700"
                       }`}>
-                        {order.fulfillment_status.replace(/_/g, " ")}
+                        {(order.fulfillment_status || "").replace(/_/g, " ")}
                       </span>
                     </div>
                   </div>
@@ -970,7 +970,7 @@ function ReturnsSection({
                 <p className="text-sm font-medium truncate">
                   {firstItem?.variant?.product?.title || firstItem?.title || `Order #${o.display_id}`}
                 </p>
-                <p className="text-xs text-gray-500 capitalize mb-1">{o.fulfillment_status.replace(/_/g, " ")}</p>
+                <p className="text-xs text-gray-500 capitalize mb-1">{(o.fulfillment_status || "").replace(/_/g, " ")}</p>
                 <ReturnInfo orderId={o.id} />
               </div>
               {submittedReturns.includes(o.id) ? (
@@ -1065,7 +1065,7 @@ function ReturnsSection({
               <div key={o.id} className="bg-white border border-gray-200 px-4 py-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm">Order #{o.display_id}</p>
-                  <p className="text-xs text-gray-500 capitalize">{o.fulfillment_status.replace(/_/g, " ")}</p>
+                  <p className="text-xs text-gray-500 capitalize">{(o.fulfillment_status || "").replace(/_/g, " ")}</p>
                 </div>
                 <span className="text-[10px] text-gray-400">Not eligible</span>
               </div>
