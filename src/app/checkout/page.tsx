@@ -657,7 +657,6 @@ function CheckoutContent() {
   const orderSummary = (
     <div style={{ position: "relative" }}>
       <div className={`mc-loader-overlay${savingMethod ? " active" : ""}`}>
-        <span className="mc-loader-text">Updating Total Price...</span>
         <span className="loader" />
       </div>
     <section style={{ fontFamily: "Hellix, ABCDiorIcons, arial, sans-serif" }}>
