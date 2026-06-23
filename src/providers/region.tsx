@@ -35,10 +35,16 @@ type RegionProviderProps = {
 // Detect user's country from IP using free geolocation API
 async function detectUserCountry(): Promise<string | null> {
   try {
+    console.log("Detecting user country...")
     const response = await fetch("https://ipapi.co/json/")
-    if (!response.ok) return null
+    if (!response.ok) {
+      console.error("IP API response not OK:", response.status)
+      return null
+    }
     const data = await response.json()
-    return data.country_code?.toLowerCase() || null
+    const countryCode = data.country_code?.toLowerCase() || null
+    console.log("Detected country code:", countryCode)
+    return countryCode
   } catch (error) {
     console.error("Error detecting country:", error)
     return null
@@ -67,18 +73,23 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
       detectUserCountry()
         .then(async (countryCode) => {
           const { regions } = await sdk.store.region.list()
+          console.log("Available regions:", regions?.map((r: any) => ({ name: r.name, currency: r.currency_code })))
           if (regions && regions.length > 0) {
             // Try to find region matching user's country
             if (countryCode) {
               const matchedRegion = findRegionForCountry(regions, countryCode)
               if (matchedRegion) {
+                console.log("Matched region for country", countryCode, ":", matchedRegion.name, matchedRegion.currency_code)
                 setRegion(matchedRegion)
                 return
               }
+              console.log("No region found for country:", countryCode)
             }
-            // Fallback to first region (or GBP region if available)
+            // Fallback to GBP region if available, otherwise first region
             const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
-            setRegion(gbpRegion || regions[0])
+            const fallbackRegion = gbpRegion || regions[0]
+            console.log("Using fallback region:", fallbackRegion.name, fallbackRegion.currency_code)
+            setRegion(fallbackRegion)
           }
         })
         .catch((error) => {
@@ -88,7 +99,9 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
             .then(({ regions }) => {
               if (regions && regions.length > 0) {
                 const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
-                setRegion(gbpRegion || regions[0])
+                const fallbackRegion = gbpRegion || regions[0]
+                console.log("Using fallback region after error:", fallbackRegion.name, fallbackRegion.currency_code)
+                setRegion(fallbackRegion)
               }
             })
         })

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/medusa/cart-context";
 import { getCart, updateCartItem, removeFromCart } from "@/lib/medusa/cart";
 import { formatPrice } from "@/lib/utils/format";
+import { useRegion } from "@/providers/region";
 
 type MedusaCart = NonNullable<Awaited<ReturnType<typeof getCart>>>;
 
@@ -52,6 +53,7 @@ function AccordionPanel({ open, children }: { open: boolean; children: React.Rea
 export default function CartRoute() {
   const router = useRouter();
   const { cartId, isLoading } = useCart();
+  const { region } = useRegion();
   const [cart, setCart] = useState<MedusaCart | null>(null);
   const [fetching, setFetching] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -71,6 +73,26 @@ export default function CartRoute() {
       .catch(console.error)
       .finally(() => setFetching(false));
   }, [cartId, isLoading]);
+
+  // Update cart region if it doesn't match selected region
+  useEffect(() => {
+    if (!cart || !region || !cartId) return;
+    
+    if (cart.region?.id !== region.id) {
+      console.log("Updating cart region from", cart.region?.currency_code, "to", region.currency_code);
+      (async () => {
+        try {
+          const sdk = (await import("../../lib/medusa/client")).default;
+          const { cart: updatedCart } = await sdk.store.cart.update(cartId, {
+            region_id: region.id,
+          });
+          setCart(updatedCart as MedusaCart);
+        } catch (error) {
+          console.error("Error updating cart region:", error);
+        }
+      })();
+    }
+  }, [cart, region, cartId]);
 
   const handleQtyChange = async (itemId: string, qty: number) => {
     if (qty < 1 || qty > 2 || !cartId) return;
@@ -99,6 +121,7 @@ export default function CartRoute() {
       const metadata: Record<string, string> = {}
       if (offerAsGift) metadata.gift_packaging = "true"
       if (giftNote.trim()) metadata.gift_message = giftNote.trim()
+      metadata.packaging_type = packagingOption // Add packaging type (signature or eco)
       if (Object.keys(metadata).length > 0) {
         await sdk.store.cart.update(cartId, { metadata })
       }

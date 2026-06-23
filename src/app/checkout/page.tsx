@@ -16,6 +16,7 @@ import { getShippingOptions, setShippingMethod, initiatePayPalSession, initiateS
 import { isValidPhoneNumber } from "libphonenumber-js"
 import { formatPrice, formatPriceFree } from "@/lib/utils/format"
 import { useCart } from "@/lib/medusa/cart-context"
+import { useRegion } from "@/providers/region"
 
 function AccordionPanel({ open, children }: { open: boolean; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -81,6 +82,7 @@ function CheckoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { cartId: contextCartId } = useCart()
+  const { region } = useRegion()
   const urlCartId = searchParams?.get("cart_id") ?? null
   const cartId = contextCartId || urlCartId
 
@@ -199,6 +201,26 @@ function CheckoutContent() {
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [cartId])
+
+  // Update cart region if it doesn't match selected region
+  useEffect(() => {
+    if (!cart || !region || !cartId) return;
+    
+    if (cart.region?.id !== region.id) {
+      console.log("Checkout: Updating cart region from", cart.region?.currency_code, "to", region.currency_code);
+      (async () => {
+        try {
+          const sdk = (await import("../../lib/medusa/client")).default;
+          const { cart: updatedCart } = await sdk.store.cart.update(cartId, {
+            region_id: region.id,
+          });
+          setCart(updatedCart as CartData);
+        } catch (error) {
+          console.error("Error updating cart region in checkout:", error);
+        }
+      })();
+    }
+  }, [cart, region, cartId])
 
   useEffect(() => {
     if (!cartId) return
