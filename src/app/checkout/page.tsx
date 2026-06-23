@@ -95,6 +95,7 @@ function CheckoutContent() {
   const [selectedShipping, setSelectedShipping] = useState<string>("")
   const [paymentProvider, setPaymentProvider] = useState<"paypal" | "stripe" | "">("")
   const [paymentError, setPaymentError] = useState<string | null>(null)
+  const [switchingPayment, setSwitchingPayment] = useState(false)
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
 
   const [identOption, setIdentOption] = useState<IdentOption | null>(null)
@@ -557,7 +558,8 @@ function CheckoutContent() {
   }, [cartId, selectedShipping])
 
   const handleSelectPayment = useCallback(async (provider: "paypal" | "stripe") => {
-    if (!cartId) return
+    if (!cartId || switchingPayment) return
+    setSwitchingPayment(true)
     setPaymentProvider(provider)
     setPaymentError(null)
     if (provider === "paypal") setStripeClientSecret(null)
@@ -575,8 +577,10 @@ function CheckoutContent() {
     } catch (err: any) {
       setPaymentProvider("")
       setPaymentError(err?.message || `Failed to initialize ${provider} payment.`)
+    } finally {
+      setSwitchingPayment(false)
     }
-  }, [cartId])
+  }, [cartId, switchingPayment])
 
   const handlePaymentComplete = useCallback(async () => {
     if (!cartId) return
