@@ -77,8 +77,8 @@ function formatDate(dateStr?: string) {
   return new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeStyle: "short" }).format(new Date(dateStr))
 }
 
-function statusLabel(s: string): string {
-  return s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+function statusLabel(s?: string): string {
+  return (s || "fulfilled").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 function paymentProviderLabel(pid: string): string {
