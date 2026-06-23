@@ -68,8 +68,13 @@ interface OrderDisplay {
 }
 
 function formatPrice(amount: number, currency?: string) {
+  if (isNaN(amount) || amount == null) return "£0.00"
   const code = (currency || "gbp").toUpperCase()
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: code }).format(amount / 100)
+  // Check if amount is in cents (integer and > 100) or already in decimal format
+  // If it's an integer and > 100, assume it's in cents and divide by 100
+  // Otherwise, assume it's already in decimal format
+  const normalizedAmount = Number.isInteger(amount) && amount > 100 ? amount / 100 : amount
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency: code }).format(normalizedAmount)
 }
 
 function formatDate(dateStr?: string) {
@@ -117,10 +122,28 @@ function StatusTimeline({ paymentStatus, fulfillmentStatus, createdAt }: {
 
   const getStep = (s: string, type: "payment" | "fulfillment"): number => {
     if (type === "payment") {
-      const m: Record<string, number> = { pending: 0, requires_action: 0, not_paid: 0, awaiting: 1, captured: 1, authorized: 1, paid: 1, partially_refunded: 2, refunded: 2 }
+      const m: Record<string, number> = { 
+        pending: 0, 
+        requires_action: 0, 
+        not_paid: 0, 
+        awaiting: 0,
+        authorized: 1, 
+        captured: 1, 
+        paid: 1, 
+        partially_refunded: 2, 
+        refunded: 2 
+      }
       return m[s] ?? 0
     }
-    const m: Record<string, number> = { not_fulfilled: 0, partially_fulfilled: 1, fulfilled: 1, partially_shipped: 1, shipped: 2, partially_delivered: 2, delivered: 3 }
+    const m: Record<string, number> = { 
+      not_fulfilled: 0, 
+      partially_fulfilled: 1, 
+      fulfilled: 1, 
+      partially_shipped: 1, 
+      shipped: 2, 
+      partially_delivered: 2, 
+      delivered: 3 
+    }
     return m[s] ?? 0
   }
 
