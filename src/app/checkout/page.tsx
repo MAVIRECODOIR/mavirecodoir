@@ -152,7 +152,8 @@ function CheckoutContent() {
     }
     const script = document.createElement("script")
     script.id = "paypal-js-sdk"
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=GBP&intent=capture&disable-funding=card,venmo`
+    const cartCurrency = cart?.region?.currency_code?.toUpperCase() || "GBP"
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${cartCurrency}&intent=capture&disable-funding=card,venmo`
     script.async = true
     script.onload = () => { setPaypalSdkReady(true); paypalPreloadedRef.current = true }
     script.onerror = () => { paypalPreloadedRef.current = true /* don't block */ }

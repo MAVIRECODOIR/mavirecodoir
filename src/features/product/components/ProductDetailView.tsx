@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
 import { addToCart } from "@/lib/medusa/cart";
+import { readLocalePrefs } from "@/lib/locale";
 import type { ProductionStatus } from "../types/product.types";
 import type { ProductDetail, ProductImage } from "../types/product.types";
 import type { WishlistItem } from "@/lib/wishlist";
@@ -30,12 +31,10 @@ const TAB_CONTENT: Record<TabKey, string> = {
   delivery: "Free standard delivery on all orders. Express delivery available for £12. Returns accepted within 30 days of receipt in original condition.",
 };
 
-const STORE_CURRENCY = "GBP";
-
-function getStorePrice(variant: ProductDetail["variants"][number] | undefined) {
+function getStorePrice(variant: ProductDetail["variants"][number] | undefined, currency: string) {
   if (!variant?.prices?.length) return undefined;
   return variant.prices.find(
-    (p) => p.currency_code.toLowerCase() === STORE_CURRENCY.toLowerCase()
+    (p) => p.currency_code.toLowerCase() === currency.toLowerCase()
   ) ?? variant.prices[0];
 }
 
@@ -88,6 +87,12 @@ function resolveStatus(variant: ProductDetail["variants"][number], product: Prod
 export function ProductDetailView({ product }: ProductDetailViewProps) {
   const router = useRouter();
   const { ensureCart } = useCart();
+  const [userCurrency, setUserCurrency] = useState("GBP");
+
+  useEffect(() => {
+    const prefs = readLocalePrefs();
+    setUserCurrency(prefs.currency);
+  }, []);
 
   const uniqueColors = useMemo(() => {
     const set = new Set<string>();
@@ -158,8 +163,8 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
 
   const status = statusLabel[productionStatus] ?? statusLabel.in_stock;
 
-  const price = getStorePrice(selectedVariant);
-  const displayCurrency = price?.currency_code ?? STORE_CURRENCY;
+  const price = getStorePrice(selectedVariant, userCurrency);
+  const displayCurrency = price?.currency_code ?? userCurrency;
   const isNew = product.tags?.some((t) => t.value === "new");
 
   const { toggle, has, open } = useWishlist();

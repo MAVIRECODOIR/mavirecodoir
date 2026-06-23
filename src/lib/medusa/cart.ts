@@ -1,5 +1,16 @@
 import sdk from "./client"
 
+async function getRegionIdByCurrency(currencyCode: string): Promise<string | undefined> {
+  try {
+    const { regions } = await sdk.store.region.list({ limit: "10" } as any)
+    if (!regions?.length) return undefined
+    const region = regions.find((r: any) => r.currency_code?.toLowerCase() === currencyCode.toLowerCase())
+    return region?.id
+  } catch {
+    return undefined
+  }
+}
+
 async function getDefaultRegionId(): Promise<string | undefined> {
   try {
     const { regions } = await sdk.store.region.list({ limit: "10" } as any)
@@ -13,9 +24,18 @@ async function getDefaultRegionId(): Promise<string | undefined> {
 
 let cachedRegionId: string | undefined
 
-export async function createCart(regionId?: string) {
+export async function createCart(currencyCode?: string) {
   try {
-    const id = regionId || cachedRegionId || await getDefaultRegionId()
+    let id: string | undefined;
+    
+    if (currencyCode) {
+      id = await getRegionIdByCurrency(currencyCode);
+    }
+    
+    if (!id) {
+      id = cachedRegionId || await getDefaultRegionId();
+    }
+    
     if (id) cachedRegionId = id
     const { cart } = await sdk.store.cart.create({
       region_id: id,

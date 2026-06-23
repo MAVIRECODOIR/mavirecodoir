@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react"
 import { createCart, getCart } from "./cart"
+import { readLocalePrefs } from "@/lib/locale"
 
 const CART_ID_KEY = "medusa_cart_id"
 
@@ -47,7 +48,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const ensureCart = useCallback(async () => {
     if (cartId) return cartId
-    const newId = await createCart()
+    const prefs = readLocalePrefs()
+    const newId = await createCart(prefs.currency)
     localStorage.setItem(CART_ID_KEY, newId)
     setCartId(newId)
     return newId
