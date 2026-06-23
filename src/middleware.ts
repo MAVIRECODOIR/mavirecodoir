@@ -25,7 +25,7 @@ function getCountryFromLocale(request: NextRequest): string {
   return DEFAULT_COUNTRY
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Skip if URL already has a country code prefix
@@ -40,7 +40,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Check if user has a saved country preference cookie
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const savedCountry = cookieStore.get('preferred_country')?.value
   const country = (savedCountry && SUPPORTED_COUNTRIES.includes(savedCountry))
     ? savedCountry

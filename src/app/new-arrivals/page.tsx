@@ -1,6 +1,6 @@
 import { getProducts } from "../../lib/medusa/products";
 import { getRegionId } from "@/lib/region";
-import FilterSortDrawer from "../men/new/FilterSortDrawer";
+import FilterSortDrawer from "../[countryCode]/men/new/FilterSortDrawer";
 import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";
 
 type SortConfig = { sortKey: string; reverse: boolean; label: string; value: string };

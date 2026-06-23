@@ -4,7 +4,6 @@ import { EB_Garamond } from "next/font/google";
 
 import { siteConfig } from "../lib/config/base";
 import LayoutShell from "../components/layout/LayoutShell";
-import { RegionProvider } from "../providers/region";
 
 const displayFont = EB_Garamond({
   subsets: ["latin"],
@@ -31,9 +30,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={displayFont.variable}>
       <body>
-        <RegionProvider>
-          <LayoutShell>{children}</LayoutShell>
-        </RegionProvider>
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );
