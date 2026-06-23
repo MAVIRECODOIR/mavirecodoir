@@ -1302,10 +1302,10 @@ function CheckoutContent() {
                                   <div style={{ marginTop: "16px", marginBottom: "16px" }}>
                                     <div className="mc-form-grid">
                                       {/* Title */}
-                                      <div className="mc-form-cell">
+                                      <div className="mc-form-cell" style={{ flex: "0 0 80px" }}>
                                         <div className="mc-field-row">
                                           <div className="mc-field">
-                                            <label className="mc-label-float" data-shrink="true">Title <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
+                                            <label className="mc-label-float" data-shrink="true">Title</label>
                                             <div className="mc-input-base" style={{ borderBottom: "1px solid #E5E5E5" }}>
                                               <select
                                                 value={address.title || "mr"}
@@ -1325,12 +1325,11 @@ function CheckoutContent() {
                                           </div>
                                         </div>
                                       </div>
-                                      <div style={{ width: "100%", flexBasis: 0 }} />
                                       {/* First name */}
-                                      <div className="mc-form-cell">
+                                      <div className="mc-form-cell" style={{ flex: 1 }}>
                                         <div className="mc-field-row">
                                           <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
-                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-firstName">First name <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
+                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-firstName">First name *</label>
                                             <div className="mc-input-base">
                                               <input
                                                 id="shipping-firstName"
@@ -1345,10 +1344,10 @@ function CheckoutContent() {
                                         </div>
                                       </div>
                                       {/* Last name */}
-                                      <div className="mc-form-cell">
+                                      <div className="mc-form-cell" style={{ flex: 1 }}>
                                         <div className="mc-field-row">
                                           <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
-                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-lastName">Last name <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
+                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-lastName">Last name *</label>
                                             <div className="mc-input-base">
                                               <input
                                                 id="shipping-lastName"
@@ -1362,24 +1361,61 @@ function CheckoutContent() {
                                           </div>
                                         </div>
                                       </div>
-                                      {/* Country / Region (disabled) */}
+                                      {/* Country / Region */}
                                       <div className="mc-form-cell-full">
                                         <div className="mc-field-row">
                                           <div className="mc-field">
-                                            <label className="mc-label-float" data-shrink="true">Country / Region <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
+                                            <label className="mc-label-float" data-shrink="true">Country / region *</label>
                                             <div className="mc-input-base" style={{ borderBottom: "1px solid #E5E5E5" }}>
                                               <select
                                                 value={address.country_code}
-                                                onChange={(e) => handleAddressChange("country_code", e.target.value)}
+                                                onChange={(e) => {
+                                                  handleAddressChange("country_code", e.target.value);
+                                                  // Re-fetch shipping options when country changes
+                                                  if (cartId) {
+                                                    getShippingOptions(cartId)
+                                                      .then((opts) => {
+                                                        setShippingOptions(opts);
+                                                        if (opts.length === 1) setSelectedShipping(opts[0].id);
+                                                      })
+                                                      .catch(console.error);
+                                                  }
+                                                }}
                                                 className="mc-input"
                                                 style={{ padding: "0 24px 8px 0", background: "transparent", cursor: "pointer" }}
                                               >
                                                 <option value="GB">United Kingdom</option>
-                                                <option value="US">United States</option>
-                                                <option value="DE">Germany</option>
+                                                <option value="IE">Ireland</option>
                                                 <option value="FR">France</option>
+                                                <option value="DE">Germany</option>
                                                 <option value="IT">Italy</option>
                                                 <option value="ES">Spain</option>
+                                                <option value="NL">Netherlands</option>
+                                                <option value="BE">Belgium</option>
+                                                <option value="AT">Austria</option>
+                                                <option value="DK">Denmark</option>
+                                                <option value="SE">Sweden</option>
+                                                <option value="NO">Norway</option>
+                                                <option value="CH">Switzerland</option>
+                                                <option value="PL">Poland</option>
+                                                <option value="CZ">Czech Republic</option>
+                                                <option value="PT">Portugal</option>
+                                                <option value="GR">Greece</option>
+                                                <option value="FI">Finland</option>
+                                                <option value="US">United States</option>
+                                                <option value="CA">Canada</option>
+                                                <option value="AU">Australia</option>
+                                                <option value="NZ">New Zealand</option>
+                                                <option value="JP">Japan</option>
+                                                <option value="SG">Singapore</option>
+                                                <option value="HK">Hong Kong</option>
+                                                <option value="AE">United Arab Emirates</option>
+                                                <option value="ZA">South Africa</option>
+                                                <option value="BR">Brazil</option>
+                                                <option value="MX">Mexico</option>
+                                                <option value="IN">India</option>
+                                                <option value="KR">South Korea</option>
+                                                <option value="IL">Israel</option>
                                               </select>
                                               <svg className="mc-select-chevron" viewBox="0 0 24 24" width="24" height="24" fill="none">
                                                 <path fill="currentColor" fillRule="evenodd" d="M18.131 9.505a.7.7 0 0 1 0 .99l-5.636 5.636a.7.7 0 0 1-.99 0l-5.636-5.636a.7.7 0 0 1 .99-.99L12 14.646l5.141-5.141a.7.7 0 0 1 .99 0" clipRule="evenodd" />
@@ -1388,49 +1424,12 @@ function CheckoutContent() {
                                           </div>
                                         </div>
                                       </div>
-                                      {/* Postcode */}
-                                      <div className="mc-form-cell">
-                                        <div className="mc-field-row">
-                                          <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
-                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-postalCode">Postcode <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
-                                            <div className="mc-input-base">
-                                              <input
-                                                id="shipping-postalCode"
-                                                value={address.postal_code}
-                                                onChange={(e) => handleAddressChange("postal_code", e.target.value)}
-                                                autoComplete="postal-code"
-                                                placeholder="SW1W 0NY"
-                                                className="mc-input"
-                                                style={{ padding: "0 4px 10px 0", cursor: "text" }}
-                                              />
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      {/* City */}
-                                      <div className="mc-form-cell">
-                                        <div className="mc-field-row">
-                                          <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
-                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-city">City <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
-                                            <div className="mc-input-base">
-                                              <input
-                                                id="shipping-city"
-                                                value={address.city}
-                                                onChange={(e) => handleAddressChange("city", e.target.value)}
-                                                autoComplete="address-level2"
-                                                className="mc-input"
-                                                style={{ padding: "0 0 8px", cursor: "text" }}
-                                              />
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
                                       {/* Address (with Google autocomplete) */}
                                       <div className="mc-form-cell-full">
                                         <div className="mc-field-row">
                                           <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
-                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-address1">Address <span aria-hidden="true" style={{ visibility: "hidden" }}>*</span></label>
-                                            <div className="mc-input-base">
+                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-address1">Address *</label>
+                                            <div className="mc-input-base" style={{ position: "relative" }}>
                                               <GoogleAddressAutocomplete
                                                 value={address.address_1}
                                                 onChange={(v) => handleAddressChange("address_1", v)}
@@ -1456,6 +1455,43 @@ function CheckoutContent() {
                                                 autoComplete="address-line2"
                                                 className="mc-input"
                                                 style={{ padding: "0 4px 10px 0", cursor: "text" }}
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      {/* Postcode */}
+                                      <div className="mc-form-cell" style={{ flex: 1 }}>
+                                        <div className="mc-field-row">
+                                          <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
+                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-postalCode">Postcode *</label>
+                                            <div className="mc-input-base">
+                                              <input
+                                                id="shipping-postalCode"
+                                                value={address.postal_code}
+                                                onChange={(e) => handleAddressChange("postal_code", e.target.value)}
+                                                autoComplete="postal-code"
+                                                placeholder="SW1W 0NY"
+                                                className="mc-input"
+                                                style={{ padding: "0 4px 10px 0", cursor: "text" }}
+                                              />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      {/* City */}
+                                      <div className="mc-form-cell" style={{ flex: 1 }}>
+                                        <div className="mc-field-row">
+                                          <div className="mc-field" style={{ borderBottom: "1px solid #E5E5E5" }}>
+                                            <label className="mc-label-float" style={{ fontSize: "14px" }} htmlFor="shipping-city">City *</label>
+                                            <div className="mc-input-base">
+                                              <input
+                                                id="shipping-city"
+                                                value={address.city}
+                                                onChange={(e) => handleAddressChange("city", e.target.value)}
+                                                autoComplete="address-level2"
+                                                className="mc-input"
+                                                style={{ padding: "0 0 8px", cursor: "text" }}
                                               />
                                             </div>
                                           </div>

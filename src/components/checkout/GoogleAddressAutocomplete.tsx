@@ -235,13 +235,17 @@ export default function GoogleAddressAutocomplete({
             querySuggestions(value);
           }
         }}
-        placeholder="Search for your address..."
-        style={inputStyle}
+        placeholder="Start typing your address..."
+        style={{
+          ...inputStyle,
+          position: "relative",
+          zIndex: 1,
+        }}
         autoComplete="off"
         required={required}
       />
       {loading && (
-        <div style={{ position: "absolute", right: "8px", top: "6px" }}>
+        <div style={{ position: "absolute", right: "8px", top: "6px", zIndex: 2, pointerEvents: "none" }}>
           <div style={{ width: "14px", height: "14px", border: "2px solid #E5E5E5", borderTopColor: "#33383C", borderRadius: "50%" }} />
         </div>
       )}
@@ -250,16 +254,19 @@ export default function GoogleAddressAutocomplete({
           ref={dropdownRef}
           style={{
             position: "absolute",
-            zIndex: 50,
-            width: "100%",
+            zIndex: 1000,
+            top: "100%",
+            left: 0,
+            right: 0,
             background: "#fff",
             border: "1px solid #E5E5E5",
             borderTop: "none",
             maxHeight: "220px",
             overflowY: "auto",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             borderRadius: "0 0 2px 2px",
             fontFamily: "Hellix, ABCDiorIcons, arial, sans-serif",
+            marginTop: "-1px",
           }}
         >
           {suggestions.map((s, i) => (
