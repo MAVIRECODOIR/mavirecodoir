@@ -26,11 +26,11 @@ export async function GET(
     const mavireToken = cookies.split(";").find(c => c.trim().startsWith("mavire_token="))?.split("=").slice(1).join("=") || ""
 
     const res = await fetch(url, {
+      cache: "no-store",
       headers: {
         cookie: cookies,
         ...(mavireToken ? { authorization: `Bearer ${mavireToken}` } : {}),
       },
-      next: { revalidate: 0 },
     })
 
     const data = await res.json()
