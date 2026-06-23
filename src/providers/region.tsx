@@ -25,6 +25,8 @@ type StoreRegion = {
 type RegionContextType = {
   region?: StoreRegion
   setRegion: React.Dispatch<React.SetStateAction<StoreRegion | undefined>>
+  setRegionById: (regionId: string) => void
+  allRegions: StoreRegion[]
 }
 
 const RegionContext = createContext<RegionContextType | null>(null)
@@ -33,8 +35,88 @@ type RegionProviderProps = {
   children: React.ReactNode
 }
 
-// Detect user's country from IP using multiple geolocation APIs with fallbacks
-async function detectUserCountry(): Promise<string | null> {
+// Detect user's country from browser locale/timezone (client-side, more reliable)
+function detectCountryFromBrowser(): string | null {
+  try {
+    // Try timezone first (most reliable)
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    console.log("Browser timezone:", timezone)
+    
+    const timezoneCountryMap: Record<string, string> = {
+      "Europe/London": "gb",
+      "Europe/Paris": "fr",
+      "Europe/Berlin": "de",
+      "Europe/Rome": "it",
+      "Europe/Madrid": "es",
+      "Europe/Amsterdam": "nl",
+      "Europe/Brussels": "be",
+      "Europe/Vienna": "at",
+      "Europe/Dublin": "ie",
+      "Europe/Stockholm": "se",
+      "Europe/Copenhagen": "dk",
+      "Europe/Helsinki": "fi",
+      "Europe/Warsaw": "pl",
+      "Europe/Prague": "cz",
+      "Europe/Budapest": "hu",
+      "Europe/Bucharest": "ro",
+      "Europe/Athens": "gr",
+      "Europe/Lisbon": "pt",
+      "Europe/Zurich": "ch",
+      "Europe/Oslo": "no",
+      "America/New_York": "us",
+      "America/Los_Angeles": "us",
+      "America/Chicago": "us",
+      "America/Toronto": "ca",
+      "America/Vancouver": "ca",
+      "Asia/Tokyo": "jp",
+      "Asia/Seoul": "kr",
+      "Asia/Singapore": "sg",
+      "Asia/Hong_Kong": "hk",
+      "Asia/Dubai": "ae",
+      "Australia/Sydney": "au",
+      "Australia/Melbourne": "au",
+      "Pacific/Auckland": "nz",
+      "Asia/Kolkata": "in",
+      "Asia/Bangkok": "th",
+      "Asia/Jakarta": "id",
+      "Asia/Manila": "ph",
+      "Asia/Taipei": "tw",
+      "Asia/Kuala_Lumpur": "my",
+      "Africa/Johannesburg": "za",
+      "America/Sao_Paulo": "br",
+      "America/Buenos_Aires": "ar",
+      "America/Santiago": "cl",
+      "America/Bogota": "co",
+      "America/Lima": "pe",
+      "America/Mexico_City": "mx"
+    }
+
+    const countryFromTimezone = timezoneCountryMap[timezone]
+    if (countryFromTimezone) {
+      console.log("Detected country from timezone:", countryFromTimezone)
+      return countryFromTimezone
+    }
+
+    // Fallback to locale
+    const locale = navigator.language || navigator.languages?.[0]
+    console.log("Browser locale:", locale)
+    
+    if (locale) {
+      const localeCountry = locale.split("-")[1]?.toLowerCase()
+      if (localeCountry) {
+        console.log("Detected country from locale:", localeCountry)
+        return localeCountry
+      }
+    }
+  } catch (error) {
+    console.error("Error detecting country from browser:", error)
+  }
+
+  return null
+}
+
+// Detect user's country from IP using multiple geolocation APIs with fallbacks (client-side)
+async function detectCountryFromIP(): Promise<string | null> {
   const apis = [
     {
       name: "ipapi.co",
@@ -63,7 +145,7 @@ async function detectUserCountry(): Promise<string | null> {
       }
       const data = await response.json()
       const countryCode = api.extract(data)
- console.log(`${api.name} detected country code:`, countryCode)
+      console.log(`${api.name} detected country code:`, countryCode)
       if (countryCode) return countryCode
     } catch (error) {
       console.error(`Error detecting country with ${api.name}:`, error)
@@ -72,6 +154,21 @@ async function detectUserCountry(): Promise<string | null> {
 
   console.error("All geolocation APIs failed")
   return null
+}
+
+// Combined detection: browser first, then IP
+async function detectUserCountry(): Promise<string | null> {
+  // Try browser-based detection first (no network call, more reliable)
+  const browserCountry = detectCountryFromBrowser()
+  if (browserCountry) {
+    console.log("Using browser-detected country:", browserCountry)
+    return browserCountry
+  }
+
+  // Fallback to IP geolocation
+  console.log("Browser detection failed, trying IP geolocation...")
+  const ipCountry = await detectCountryFromIP()
+  return ipCountry
 }
 
 // Find region that contains the user's country
@@ -84,6 +181,16 @@ function findRegionForCountry(regions: StoreRegion[], countryCode: string): Stor
 export const RegionProvider = ({ children }: RegionProviderProps) => {
   const [region, setRegion] = useState<StoreRegion>()
   const [previousRegionId, setPreviousRegionId] = useState<string>()
+  const [allRegions, setAllRegions] = useState<StoreRegion[]>([])
+
+  // Manual region override function
+  const setRegionById = (regionId: string) => {
+    const selectedRegion = allRegions.find(r => r.id === regionId)
+    if (selectedRegion) {
+      console.log("Manually setting region to:", selectedRegion.name, selectedRegion.currency_code)
+      setRegion(selectedRegion)
+    }
+  }
 
   useEffect(() => {
     if (region) {
@@ -115,6 +222,7 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
       detectUserCountry()
         .then(async (countryCode) => {
           const { regions } = await sdk.store.region.list({ fields: "*,*countries" } as any)
+          setAllRegions(regions || [])
           console.log("Available regions:", regions?.map((r: any) => ({ name: r.name, currency: r.currency_code, countries: r.countries?.map((c: any) => c.iso_2) })))
           if (regions && regions.length > 0) {
             // Try to find region matching user's country
@@ -139,6 +247,7 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
           // Fallback to fetching first region
           sdk.store.region.list({ fields: "*,*countries" } as any)
             .then(({ regions }) => {
+              setAllRegions(regions || [])
               if (regions && regions.length > 0) {
                 const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
                 const fallbackRegion = gbpRegion || regions[0]
@@ -169,7 +278,7 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
   }, [region, previousRegionId])
 
   return (
-    <RegionContext.Provider value={{ region, setRegion }}>
+    <RegionContext.Provider value={{ region, setRegion, setRegionById, allRegions }}>
       {children}
     </RegionContext.Provider>
   )
