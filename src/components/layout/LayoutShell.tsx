@@ -7,6 +7,7 @@ import CookiePopup from "../ui/CookiePopup";
 import Footer from "./Footer";
 import { WishlistProvider } from "@/lib/wishlist";
 import WishlistPanel from "@/components/wishlist/WishlistPanel";
+import CartDrawer from "@/components/cart/CartDrawer";
 import { CartProvider } from "@/lib/medusa/cart-context";
 
 const BARE_PREFIXES: string[] = [];
@@ -28,6 +29,7 @@ export default function LayoutShell({ children }: { children: ReactNode }) {
       <main>{children}</main>
       {!isMinimalFlow && !isClient && <Footer />}
       <WishlistPanel />
+      <CartDrawer />
       <CookiePopup />
     </WishlistProvider>
     </CartProvider>

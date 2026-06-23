@@ -110,7 +110,7 @@ export default function Header() {
   }
 
   const wishlist = useWishlist();
-  const { cartId } = useCart();
+  const { cartId, openCart } = useCart();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -192,9 +192,10 @@ export default function Header() {
   const iconList = (
     <ul className="flex items-center gap-0 md:gap-0.5">
       <li className="hidden md:flex">
-        <Link
-          href="/cart"
+        <button
+          onClick={openCart}
           aria-label="my shopping bag"
+          aria-haspopup="dialog"
           className="mavire-btn-motion flex items-center justify-center w-10 h-10 relative"
         >
           <BagIcon color={iconColor} />
@@ -203,7 +204,7 @@ export default function Header() {
               {cartItemCount}
             </span>
           )}
-        </Link>
+        </button>
       </li>
       <li className="hidden md:flex">
         <button
@@ -267,9 +268,10 @@ export default function Header() {
         </button>
       </li>
       <li className={`${collapsed ? "hidden" : "flex"} md:hidden`}>
-        <Link
-          href="/cart"
+        <button
+          onClick={openCart}
           aria-label="my shopping bag"
+          aria-haspopup="dialog"
           className="mavire-btn-motion flex items-center justify-center w-9 h-9 relative"
         >
           <BagIcon color={iconColor} />
@@ -278,7 +280,7 @@ export default function Header() {
               {cartItemCount}
             </span>
           )}
-        </Link>
+        </button>
       </li>
       <li className={`${collapsed ? "hidden" : "flex"} md:hidden`}>
         <button

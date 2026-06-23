@@ -8,7 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react"
-import { createCart } from "../../features/cart/services/createCart"
+import { createCart, getCart } from "./cart"
 
 const CART_ID_KEY = "medusa_cart_id"
 
@@ -17,6 +17,11 @@ type CartContextType = {
   isLoading: boolean
   ensureCart: () => Promise<string>
   clearCart: () => void
+  isCartOpen: boolean
+  openCart: () => void
+  closeCart: () => void
+  cart: any | null
+  refetchCart: () => Promise<void>
 }
 
 const CartContext = createContext<CartContextType | null>(null)
@@ -24,6 +29,8 @@ const CartContext = createContext<CartContextType | null>(null)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartId, setCartId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [cart, setCart] = useState<any | null>(null)
 
   useEffect(() => {
     const stored = localStorage.getItem(CART_ID_KEY)
@@ -33,23 +40,40 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }, [])
 
+  useEffect(() => {
+    if (!cartId) { setCart(null); return }
+    getCart(cartId).then(setCart).catch(() => setCart(null))
+  }, [cartId])
+
   const ensureCart = useCallback(async () => {
-    let id = cartId
-    if (!id) {
-      id = await createCart()
-      localStorage.setItem(CART_ID_KEY, id)
-      setCartId(id)
-    }
-    return id
+    if (cartId) return cartId
+    const newId = await createCart()
+    localStorage.setItem(CART_ID_KEY, newId)
+    setCartId(newId)
+    return newId
   }, [cartId])
 
   const clearCart = useCallback(() => {
     localStorage.removeItem(CART_ID_KEY)
     setCartId(null)
+    setCart(null)
   }, [])
 
+  const openCart = useCallback(() => setIsCartOpen(true), [])
+  const closeCart = useCallback(() => setIsCartOpen(false), [])
+
+  const refetchCart = useCallback(async () => {
+    if (!cartId) return
+    try {
+      const updated = await getCart(cartId)
+      setCart(updated)
+    } catch {
+      setCart(null)
+    }
+  }, [cartId])
+
   return (
-    <CartContext.Provider value={{ cartId, isLoading, ensureCart, clearCart }}>
+    <CartContext.Provider value={{ cartId, isLoading, ensureCart, clearCart, isCartOpen, openCart, closeCart, cart, refetchCart }}>
       {children}
     </CartContext.Provider>
   )
