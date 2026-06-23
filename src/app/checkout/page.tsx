@@ -12,7 +12,7 @@ import PhoneInputWithCountry from "../../components/checkout/PhoneInputWithCount
 import StripePayment from "../../components/checkout/StripePayment"
 import { CheckoutSkeleton, ShippingOptionsSkeleton, PaymentSkeleton } from "../../components/checkout/Skeleton"
 import { getCart } from "../../lib/medusa/cart"
-import { getShippingOptions, setShippingMethod, initiatePayPalSession, initiateStripeSession, completeCart } from "../../lib/medusa/checkout"
+import { getShippingOptions, setShippingMethod, initiatePayPalSession, initiateStripeSession, completeCart, updateCartRegionIfNeeded } from "../../lib/medusa/checkout"
 import { isValidPhoneNumber } from "libphonenumber-js"
 import { formatPrice, formatPriceFree } from "@/lib/utils/format"
 import { useCart } from "@/lib/medusa/cart-context"
@@ -1368,10 +1368,18 @@ function CheckoutContent() {
                                             <div className="mc-input-base" style={{ borderBottom: "1px solid #E5E5E5" }}>
                                               <select
                                                 value={address.country_code}
-                                                onChange={(e) => {
-                                                  handleAddressChange("country_code", e.target.value);
-                                                  // Re-fetch shipping options when country changes
+                                                onChange={async (e) => {
+                                                  const newCountryCode = e.target.value;
+                                                  handleAddressChange("country_code", newCountryCode);
+
+                                                  // Update cart region if country is not in current region
                                                   if (cartId) {
+                                                    const updatedCart = await updateCartRegionIfNeeded(cartId, newCountryCode);
+                                                    if (updatedCart) {
+                                                      setCart(updatedCart as CartData);
+                                                    }
+
+                                                    // Re-fetch shipping options after region update
                                                     getShippingOptions(cartId)
                                                       .then((opts) => {
                                                         setShippingOptions(opts);
@@ -1384,6 +1392,9 @@ function CheckoutContent() {
                                                 style={{ padding: "0 24px 8px 0", background: "transparent", cursor: "pointer" }}
                                               >
                                                 <option value="GB">United Kingdom</option>
+                                                <option value="US">United States</option>
+                                                <option value="CA">Canada</option>
+                                                <option value="AU">Australia</option>
                                                 <option value="IE">Ireland</option>
                                                 <option value="FR">France</option>
                                                 <option value="DE">Germany</option>
@@ -1889,10 +1900,16 @@ function CheckoutContent() {
                                                           >
                                                             <option value="GB">United Kingdom</option>
                                                             <option value="US">United States</option>
-                                                            <option value="DE">Germany</option>
+                                                            <option value="CA">Canada</option>
+                                                            <option value="AU">Australia</option>
+                                                            <option value="IE">Ireland</option>
                                                             <option value="FR">France</option>
+                                                            <option value="DE">Germany</option>
                                                             <option value="IT">Italy</option>
                                                             <option value="ES">Spain</option>
+                                                            <option value="NL">Netherlands</option>
+                                                            <option value="BE">Belgium</option>
+                                                            <option value="AT">Austria</option>
                                                           </select>
                                                           <svg className="mc-select-chevron" viewBox="0 0 24 24" width="24" height="24" fill="none">
                                                             <path fill="currentColor" fillRule="evenodd" d="M18.131 9.505a.7.7 0 0 1 0 .99l-5.636 5.636a.7.7 0 0 1-.99 0l-5.636-5.636a.7.7 0 0 1 .99-.99L12 14.646l5.141-5.141a.7.7 0 0 1 .99 0" clipRule="evenodd" />

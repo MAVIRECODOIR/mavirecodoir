@@ -73,7 +73,7 @@ export default function CartRoute() {
   }, [cartId, isLoading]);
 
   const handleQtyChange = async (itemId: string, qty: number) => {
-    if (qty < 1 || !cartId) return;
+    if (qty < 1 || qty > 2 || !cartId) return;
     setUpdating(itemId);
     try {
       await updateCartItem(cartId, itemId, qty);

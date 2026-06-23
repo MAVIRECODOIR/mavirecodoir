@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import ProductCardWishlist from "@/components/wishlist/ProductCardWishlist";
+import { useRegion } from "@/providers/region";
 
 
 export type ProductCardData = {
@@ -49,6 +50,7 @@ export default function ProductCard({ product, idx = 0 }: { product: ProductCard
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedVariantIdx, setSelectedVariantIdx] = useState<number | null>(null);
   const touchStartX = useRef(0);
+  const { region } = useRegion();
   const tags = product.tags?.map((t) => t.value) || [];
   const colors = extractColors(tags);
   const createdAt = product.created_at instanceof Date ? product.created_at.toISOString() : (product.created_at || "");
@@ -104,11 +106,12 @@ export default function ProductCard({ product, idx = 0 }: { product: ProductCard
     setCurrentSlide(0);
   };
 
-  const activePrice = selectedVariant
-    ? selectedVariant.prices?.[0]
-    : product.variants?.[0]?.prices?.[0];
+  // Filter prices by region currency
+  const regionCurrency = region?.currency_code || "GBP";
+  const variantPrices = selectedVariant?.prices || product.variants?.[0]?.prices || [];
+  const activePrice = variantPrices.find((p: any) => p.currency_code?.toLowerCase() === regionCurrency.toLowerCase()) || variantPrices[0];
 
-  const activeCurrency = activePrice?.currency_code || "GBP";
+  const activeCurrency = activePrice?.currency_code || regionCurrency;
   const activeAmount = activePrice?.amount || 0;
 
   return (

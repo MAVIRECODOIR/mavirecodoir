@@ -32,6 +32,26 @@ type RegionProviderProps = {
   children: React.ReactNode
 }
 
+// Detect user's country from IP using free geolocation API
+async function detectUserCountry(): Promise<string | null> {
+  try {
+    const response = await fetch("https://ipapi.co/json/")
+    if (!response.ok) return null
+    const data = await response.json()
+    return data.country_code?.toLowerCase() || null
+  } catch (error) {
+    console.error("Error detecting country:", error)
+    return null
+  }
+}
+
+// Find region that contains the user's country
+function findRegionForCountry(regions: StoreRegion[], countryCode: string): StoreRegion | undefined {
+  return regions.find((region) =>
+    region.countries?.some((country) => country.iso_2.toLowerCase() === countryCode.toLowerCase())
+  )
+}
+
 export const RegionProvider = ({ children }: RegionProviderProps) => {
   const [region, setRegion] = useState<StoreRegion>()
 
@@ -43,15 +63,34 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
 
     const regionId = Cookies.get("region_id")
     if (!regionId) {
-      // Retrieve regions and select the first one
-      sdk.store.region.list()
-        .then(({ regions }) => {
+      // First, detect user's country and find matching region
+      detectUserCountry()
+        .then(async (countryCode) => {
+          const { regions } = await sdk.store.region.list()
           if (regions && regions.length > 0) {
-            setRegion(regions[0])
+            // Try to find region matching user's country
+            if (countryCode) {
+              const matchedRegion = findRegionForCountry(regions, countryCode)
+              if (matchedRegion) {
+                setRegion(matchedRegion)
+                return
+              }
+            }
+            // Fallback to first region (or GBP region if available)
+            const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
+            setRegion(gbpRegion || regions[0])
           }
         })
         .catch((error) => {
-          console.error("Error fetching regions:", error)
+          console.error("Error in region detection:", error)
+          // Fallback to fetching first region
+          sdk.store.region.list()
+            .then(({ regions }) => {
+              if (regions && regions.length > 0) {
+                const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
+                setRegion(gbpRegion || regions[0])
+              }
+            })
         })
     } else {
       // Retrieve selected region
@@ -66,7 +105,8 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
           sdk.store.region.list()
             .then(({ regions }) => {
               if (regions && regions.length > 0) {
-                setRegion(regions[0])
+                const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
+                setRegion(gbpRegion || regions[0])
               }
             })
         })
