@@ -23,6 +23,7 @@ interface Fulfillment {
   status: string
   tracking_links?: TrackingLink[]
   tracking_numbers?: string[]
+  data?: Record<string, any>
 }
 
 interface ShippingMethod {
@@ -451,11 +452,45 @@ function OrderContent() {
                   {fulfillments.map((f) => {
                     const links = f.tracking_links || []
                     const nums = f.tracking_numbers || []
+                    const fData = f.data || {}
+                    const shippoCarrier = fData.shippo_carrier
+                    const shippoService = fData.shippo_service_level
+                    const shippoTracking = fData.shippo_tracking_number
+                    const shippoTrackingUrl = fData.shippo_tracking_url
+                    const shippoLabelUrl = fData.shippo_label_url
+                    const shippoRateAmount = fData.shippo_rate_amount
+                    const shippoRateCurrency = fData.shippo_rate_currency
+
                     return (
                       <div key={f.id} className="bg-[#f9f9f9] rounded-sm p-4 text-[13px] md:text-[14px]">
                         <p className="m-0 text-[#33383C] font-medium capitalize">{statusLabel(f.status)}</p>
-                        {nums.length > 0 && <p className="m-0 mt-1 text-[#7B8487]">Tracking: {nums.join(", ")}</p>}
-                        {links.length > 0 && links.map((l) => (
+                        {shippoCarrier && <p className="m-0 mt-1 text-[#33383C] font-medium">{shippoCarrier}</p>}
+                        {shippoService && <p className="m-0 mt-0.5 text-[#7B8487]">{shippoService}</p>}
+                        {shippoTracking && (
+                          <div className="mt-2">
+                            <p className="m-0 text-[#7B8487]">Tracking: {shippoTracking}</p>
+                            {shippoTrackingUrl && (
+                              <a href={shippoTrackingUrl} target="_blank" rel="noopener noreferrer"
+                                className="inline-block mt-1 text-[#33383C] underline underline-offset-2 hover:text-[#666]">
+                                Track package ↗
+                              </a>
+                            )}
+                          </div>
+                        )}
+                        {shippoLabelUrl && (
+                          <a href={shippoLabelUrl} target="_blank" rel="noopener noreferrer"
+                            className="inline-block mt-2 text-[#33383C] underline underline-offset-2 hover:text-[#666]">
+                            View shipping label ↗
+                          </a>
+                        )}
+                        {shippoRateAmount && (
+                          <p className="m-0 mt-2 text-[#7B8487]">
+                            Shipping cost: {formatPrice(shippoRateAmount, shippoRateCurrency || order.currency_code)}
+                          </p>
+                        )}
+                        {/* Fallback to legacy tracking if no Shippo data */}
+                        {!shippoTracking && nums.length > 0 && <p className="m-0 mt-1 text-[#7B8487]">Tracking: {nums.join(", ")}</p>}
+                        {!shippoTracking && links.length > 0 && links.map((l) => (
                           l.url ? (
                             <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer"
                               className="inline-block mt-1 text-[#33383C] underline underline-offset-2 hover:text-[#666]">

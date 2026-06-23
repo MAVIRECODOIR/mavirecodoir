@@ -12,10 +12,10 @@ function getFormatter(currencyCode: string): Intl.NumberFormat {
 
 function normalizeAmount(amount: number): number {
   if (isNaN(amount) || amount == null) return 0;
-  // Check if amount is in cents (integer and >= 1) or already in decimal format
-  // If it's an integer and >= 1, assume it's in cents and divide by 100
-  // Otherwise, assume it's already in decimal format
-  return Number.isInteger(amount) && amount >= 1 ? amount / 100 : amount;
+  // Medusa stores amounts in cents (integers). 
+  // If amount >= 100, assume it's in cents and divide by 100.
+  // If amount < 100, assume it's already in decimal format (e.g., 1.05 for £1.05).
+  return amount >= 100 ? amount / 100 : amount;
 }
 
 export function formatPrice(amount: number, currencyCode: string): string {
