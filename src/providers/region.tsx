@@ -33,6 +33,8 @@ const RegionContext = createContext<RegionContextType | null>(null)
 
 type RegionProviderProps = {
   children: React.ReactNode
+  countryCode: string
+  regions: StoreRegion[]
 }
 
 // Detect user's country from browser locale/timezone (client-side, more reliable)
@@ -178,107 +180,32 @@ function findRegionForCountry(regions: StoreRegion[], countryCode: string): Stor
   )
 }
 
-export const RegionProvider = ({ children }: RegionProviderProps) => {
-  const [region, setRegion] = useState<StoreRegion>()
-  const [previousRegionId, setPreviousRegionId] = useState<string>()
-  const [allRegions, setAllRegions] = useState<StoreRegion[]>([])
+export const RegionProvider = ({ children, countryCode, regions }: RegionProviderProps) => {
+  // Find region matching the countryCode from URL
+  const region = regions.find(r =>
+    r.countries?.some((c: any) => c.iso_2.toLowerCase() === countryCode.toLowerCase())
+  )
 
-  // Manual region override function
   const setRegionById = (regionId: string) => {
-    const selectedRegion = allRegions.find(r => r.id === regionId)
-    if (selectedRegion) {
-      console.log("Manually setting region to:", selectedRegion.name, selectedRegion.currency_code)
-      setRegion(selectedRegion)
+    // Navigate to the country code for this region
+    const selectedRegion = regions.find(r => r.id === regionId)
+    if (selectedRegion && selectedRegion.countries?.[0]) {
+      const newCountryCode = selectedRegion.countries[0].iso_2.toLowerCase()
+      const currentPath = window.location.pathname
+      const newPath = currentPath.replace(/^\/[a-z]{2}(\/|$)/, `/${newCountryCode}$1`)
+      window.location.href = newPath
     }
   }
 
+  // Set region in cookie for cart operations
   useEffect(() => {
     if (region) {
       Cookies.set("region_id", region.id, { expires: 30 })
-      
-      // Update cart region if region changed
-      if (previousRegionId && previousRegionId !== region.id) {
-        const cartId = localStorage.getItem("medusa_cart_id")
-        if (cartId) {
-          console.log("Updating cart region from", previousRegionId, "to", region.id)
-          updateCartRegion(cartId, region.id)
-            .then(() => {
-              console.log("Cart region updated successfully")
-              // Trigger cart refetch by dispatching custom event
-              window.dispatchEvent(new CustomEvent('cart-region-changed'))
-            })
-            .catch((error) => {
-              console.error("Failed to update cart region:", error)
-            })
-        }
-      }
-      setPreviousRegionId(region.id)
-      return
     }
-
-    const regionId = Cookies.get("region_id")
-    if (!regionId) {
-      // First, detect user's country and find matching region
-      detectUserCountry()
-        .then(async (countryCode) => {
-          const { regions } = await sdk.store.region.list({ fields: "*,*countries" } as any)
-          setAllRegions(regions || [])
-          console.log("Available regions:", regions?.map((r: any) => ({ name: r.name, currency: r.currency_code, countries: r.countries?.map((c: any) => c.iso_2) })))
-          if (regions && regions.length > 0) {
-            // Try to find region matching user's country
-            if (countryCode) {
-              const matchedRegion = findRegionForCountry(regions, countryCode)
-              if (matchedRegion) {
-                console.log("Matched region for country", countryCode, ":", matchedRegion.name, matchedRegion.currency_code)
-                setRegion(matchedRegion)
-                return
-              }
-              console.log("No region found for country:", countryCode)
-            }
-            // Fallback to GBP region if available, otherwise first region
-            const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
-            const fallbackRegion = gbpRegion || regions[0]
-            console.log("Using fallback region:", fallbackRegion.name, fallbackRegion.currency_code)
-            setRegion(fallbackRegion)
-          }
-        })
-        .catch((error) => {
-          console.error("Error in region detection:", error)
-          // Fallback to fetching first region
-          sdk.store.region.list({ fields: "*,*countries" } as any)
-            .then(({ regions }) => {
-              setAllRegions(regions || [])
-              if (regions && regions.length > 0) {
-                const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
-                const fallbackRegion = gbpRegion || regions[0]
-                console.log("Using fallback region after error:", fallbackRegion.name, fallbackRegion.currency_code)
-                setRegion(fallbackRegion)
-              }
-            })
-        })
-    } else {
-      // Retrieve selected region
-      sdk.store.region.retrieve(regionId)
-        .then(({ region: dataRegion }) => {
-          setRegion(dataRegion)
-        })
-        .catch((error) => {
-          console.error("Error fetching region:", error)
-          // If region not found, clear cookie and fetch default
-          Cookies.remove("region_id")
-          sdk.store.region.list()
-            .then(({ regions }) => {
-              if (regions && regions.length > 0) {
-                const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
-                setRegion(gbpRegion || regions[0])
-              }
-            })
-        })
-    }
-  }, [region, previousRegionId])
+  }, [region])
 
   return (
-    <RegionContext.Provider value={{ region, setRegion, setRegionById, allRegions }}>
+    <RegionContext.Provider value={{ region, setRegion: () => {}, setRegionById, allRegions: regions }}>
       {children}
     </RegionContext.Provider>
   )
