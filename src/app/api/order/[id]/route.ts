@@ -9,13 +9,18 @@ export async function GET(
 ) {
   const { id } = await params
   const token = req.nextUrl.searchParams.get("token")
+  const email = req.nextUrl.searchParams.get("email")
 
   if (!id) {
     return NextResponse.json({ error: "Order ID is required" }, { status: 400 })
   }
 
   try {
-    const url = `${MEDUSA_BACKEND_URL}/custom/order/${encodeURIComponent(id)}${token ? `?token=${encodeURIComponent(token)}` : ""}`
+    const backendUrl = `${MEDUSA_BACKEND_URL}/custom/order/${encodeURIComponent(id)}`
+    const qs = new URLSearchParams()
+    if (token) qs.set("token", token)
+    if (email) qs.set("email", email)
+    const url = qs.toString() ? `${backendUrl}?${qs}` : backendUrl
 
     const cookies = req.headers.get("cookie") || ""
     const mavireToken = cookies.split(";").find(c => c.trim().startsWith("mavire_token="))?.split("=").slice(1).join("=") || ""

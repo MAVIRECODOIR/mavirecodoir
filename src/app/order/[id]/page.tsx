@@ -205,27 +205,78 @@ function OrderContent() {
   const [order, setOrder] = useState<OrderDisplay | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [verified, setVerified] = useState(true)
+  const [maskedEmail, setMaskedEmail] = useState("")
+  const [enteredEmail, setEnteredEmail] = useState("")
+  const [emailError, setEmailError] = useState(false)
+  const [expired, setExpired] = useState(false)
+  const [verifiedEmail, setVerifiedEmail] = useState("")
+  const emailInputRef = useRef<HTMLInputElement>(null)
   const pollRef = useRef(false)
+
+  const buildUrl = useCallback((withEmail?: string) => {
+    const qs = new URLSearchParams()
+    if (token) qs.set("token", token)
+    const emailParam = withEmail || verifiedEmail
+    if (emailParam) qs.set("email", emailParam)
+    return `/api/order/${encodeURIComponent(orderId)}${qs.toString() ? `?${qs}` : ""}`
+  }, [orderId, token, verifiedEmail])
 
   const fetchOrder = useCallback(async (showLoading?: boolean) => {
     if (!orderId) return
-    const url = `/api/order/${encodeURIComponent(orderId)}${token ? `?token=${encodeURIComponent(token)}` : ""}`
     try {
       if (showLoading) setLoading(true)
-      const res = await fetch(url, { credentials: "include" })
+      const res = await fetch(buildUrl(), { credentials: "include" })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
+        if (body?.error?.includes?.("expired")) setExpired(true)
         throw new Error(body?.error || "Order not found")
       }
       const data = await res.json()
+      if (data.verified === false && data.masked_email) {
+        setMaskedEmail(data.masked_email)
+        setVerified(false)
+        setError(null)
+        return
+      }
       setOrder(data.order || data)
+      setVerified(true)
       setError(null)
     } catch (err: unknown) {
       if (!order) setError(err instanceof Error ? err.message : "Failed to load order")
     } finally {
       if (showLoading) setLoading(false)
     }
-  }, [orderId, token])
+  }, [orderId, buildUrl])
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!enteredEmail.trim()) return
+    setLoading(true)
+    setEmailError(false)
+    setError(null)
+    try {
+      const res = await fetch(buildUrl(enteredEmail.trim()), { credentials: "include" })
+      const data = await res.json()
+      if (!res.ok) {
+        if (data?.error?.includes?.("expired")) setExpired(true)
+        throw new Error(data?.error || "Verification failed")
+      }
+      if (data.verified === false && data.masked_email) {
+        setEmailError(true)
+        setLoading(false)
+        return
+      }
+      setVerifiedEmail(enteredEmail.trim())
+      setOrder(data.order || data)
+      setVerified(true)
+      setError(null)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Verification failed")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     fetchOrder(true)
@@ -242,10 +293,65 @@ function OrderContent() {
     return () => { clearInterval(interval); pollRef.current = false }
   }, [order, loading])
 
-  if (loading) {
+  if (loading && !verified) {
+    return (
+      <div className="max-w-[800px] mx-auto px-4 py-12 md:py-16 text-center">
+        <p className="text-[14px] text-[#7B8487]">Verifying access...</p>
+      </div>
+    )
+  }
+
+  if (loading && verified && !order) {
     return (
       <div className="max-w-[800px] mx-auto px-4 py-12 md:py-16 text-center">
         <p className="text-[14px] text-[#7B8487]">Loading order...</p>
+      </div>
+    )
+  }
+
+  if (expired) {
+    return (
+      <div className="max-w-[600px] mx-auto px-4 py-12 md:py-16 text-center">
+        <h1 className="text-[22px] md:text-[24px] font-normal m-0 mb-3 text-[#33383C]">Link Expired</h1>
+        <p className="text-[14px] text-[#7B8487] m-0 mb-2">This order access link has expired.</p>
+        <p className="text-[14px] text-[#7B8487] m-0 mb-6">To view your order, please request a new link using your email address.</p>
+        <Link href="/order-and-return-tracking" className="text-[14px] text-[#33383C] underline underline-offset-2">Request a new link</Link>
+      </div>
+    )
+  }
+
+  if (!verified && maskedEmail) {
+    return (
+      <div className="max-w-[500px] mx-auto px-4 py-12 md:py-20 text-center">
+        <h1 className="text-[22px] md:text-[24px] font-normal m-0 mb-2 text-[#33383C]">Verify Your Email</h1>
+        <p className="text-[13px] md:text-[14px] text-[#7B8487] m-0 mb-6 leading-relaxed">
+          We sent your order link to <strong className="text-[#33383C]">{maskedEmail}</strong>.
+          Enter your full email address below to continue.
+        </p>
+        <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <input
+            ref={emailInputRef}
+            type="email"
+            value={enteredEmail}
+            onChange={(e) => setEnteredEmail(e.target.value)}
+            placeholder="Enter your email address"
+            autoFocus
+            className="w-full h-12 px-4 border border-[#d0d0d0] rounded-sm text-[13px] md:text-[14px] text-[#33383C] outline-none focus:border-[#33383C] transition-colors placeholder:text-[#aaa]"
+          />
+          {emailError && (
+            <p className="text-[12px] text-red-500 m-0 -mt-2">That email doesn't match. Please try again.</p>
+          )}
+          <button
+            type="submit"
+            disabled={loading || !enteredEmail.trim()}
+            className="w-full h-12 px-8 bg-[#33383C] text-white text-[13px] md:text-[14px] font-medium rounded-sm hover:bg-neutral-700 transition-colors disabled:opacity-50"
+          >
+            {loading ? "Verifying..." : "View Order"}
+          </button>
+        </form>
+        <p className="text-[12px] text-[#7B8487] m-0 mt-6">
+          <Link href="/order-and-return-tracking" className="text-[#33383C] underline underline-offset-2">Lost your access link?</Link>
+        </p>
       </div>
     )
   }
