@@ -339,60 +339,79 @@ export default function MyAccountPage() {
                     ) : (
                       <div className="space-y-3">
                         {orders.map((o) => {
-                          const item = o.items?.[0];
+                          const items = o.items || [];
                           return (
                             <Link
                               key={o.id}
                               href={`/order/${o.id}`}
                               className="block bg-white border border-gray-200 hover:border-black/30 transition-colors"
                             >
-                              <div className="flex items-center gap-4 p-4">
-                                {/* Thumbnail */}
-                                <div className="w-[52px] h-[65px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                                  {item?.thumbnail ? (
-                                    <Image
-                                      src={item.thumbnail}
-                                      alt=""
-                                      width={52}
-                                      height={65}
-                                      className="object-cover w-full h-full"
-                                      unoptimized
-                                    />
-                                  ) : (
-                                    <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
-                                  )}
-                                </div>
-                                {/* Info */}
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                              <div className="p-4">
+                                {/* Order header */}
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-2 text-xs text-gray-400">
                                     <span>Order #{o.display_id}</span>
                                     <span>&middot;</span>
                                     <span>{new Intl.DateTimeFormat("en-GB", { dateStyle: "medium" }).format(new Date(o.created_at))}</span>
                                   </div>
-                                  <p className="text-sm font-medium truncate">
-                                    {item?.variant?.product?.title || item?.title || `Order #${o.display_id}`}
-                                  </p>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    <span className="text-xs font-medium">
-                                      {new Intl.NumberFormat("en-GB", {
-                                        style: "currency",
-                                        currency: (o.currency_code || "gbp").toUpperCase(),
-                                      }).format((o.total || 0) / 100)}
-                                    </span>
-                                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${
-                                      o.fulfillment_status === "delivered"
-                                        ? "bg-green-50 text-green-700"
-                                        : o.fulfillment_status === "shipped"
-                                        ? "bg-blue-50 text-blue-700"
-                                        : o.fulfillment_status === "not_fulfilled"
-                                        ? "bg-gray-100 text-gray-500"
-                                        : "bg-amber-50 text-amber-700"
-                                    }`}>
-                                      {(o.fulfillment_status || "").replace(/_/g, " ")}
-                                    </span>
-                                  </div>
+                                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
                                 </div>
-                                <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                                {/* Items */}
+                                <div className="space-y-2">
+                                  {items.map((item) => (
+                                    <div key={item.id} className="flex items-center gap-3">
+                                      <div className="w-[40px] h-[50px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-sm">
+                                        {item.thumbnail ? (
+                                          <Image
+                                            src={item.thumbnail}
+                                            alt=""
+                                            width={40}
+                                            height={50}
+                                            className="object-cover w-full h-full"
+                                            unoptimized
+                                          />
+                                        ) : (
+                                          <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">
+                                          {item.variant?.product?.title || item.title || "Item"}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                          {item.variant?.title && <span className="mr-2">{item.variant.title}</span>}
+                                          Qty: {item.quantity}
+                                        </p>
+                                      </div>
+                                      <span className="text-xs font-medium whitespace-nowrap">
+                                        {new Intl.NumberFormat("en-GB", {
+                                          style: "currency",
+                                          currency: (o.currency_code || "gbp").toUpperCase(),
+                                        }).format((item.unit_price || 0) / 100)}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                                {/* Order total & status */}
+                                <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
+                                  <span className="text-xs font-medium">
+                                    {new Intl.NumberFormat("en-GB", {
+                                      style: "currency",
+                                      currency: (o.currency_code || "gbp").toUpperCase(),
+                                    }).format((o.total || 0) / 100)}
+                                  </span>
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${
+                                    o.fulfillment_status === "delivered"
+                                      ? "bg-green-50 text-green-700"
+                                      : o.fulfillment_status === "shipped"
+                                      ? "bg-blue-50 text-blue-700"
+                                      : o.fulfillment_status === "not_fulfilled"
+                                      ? "bg-gray-100 text-gray-500"
+                                      : "bg-amber-50 text-amber-700"
+                                  }`}>
+                                    {(o.fulfillment_status || "").replace(/_/g, " ")}
+                                  </span>
+                                </div>
                               </div>
                             </Link>
                           );
@@ -733,37 +752,49 @@ function TrackOrderSection({ orders, onGoToOrders }: { orders: OrderItem[]; onGo
           {trackingOrders.map((order) => {
             const fulfillments = order.fulfillments || [];
             const allLinks = fulfillments.flatMap((f) => f.tracking_links || []);
-            const firstItem = order.items?.[0];
+            const items = order.items || [];
             return (
               <div key={order.id} className="bg-white border border-gray-200">
-                <div className="flex items-center gap-4 p-4 border-b border-gray-100">
-                  <div className="w-[52px] h-[65px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    {firstItem?.thumbnail ? (
-                      <img
-                        src={firstItem.thumbnail}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
-                    )}
+                <div className="p-4 border-b border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-gray-400">Order #{order.display_id}</p>
+                    <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-400 mb-0.5">Order #{order.display_id}</p>
-                    <p className="text-sm font-medium truncate">
-                      {firstItem?.variant?.product?.title || firstItem?.title || `Order #${order.display_id}`}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${
-                        order.fulfillment_status === "delivered" || order.fulfillment_status === "partially_delivered"
-                          ? "bg-green-50 text-green-700"
-                          : "bg-blue-50 text-blue-700"
-                      }`}>
-                        {(order.fulfillment_status || "").replace(/_/g, " ")}
-                      </span>
-                    </div>
+                  <div className="space-y-2">
+                    {items.map((item) => (
+                      <div key={item.id} className="flex items-center gap-3">
+                        <div className="w-[40px] h-[50px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-sm">
+                          {item.thumbnail ? (
+                            <img
+                              src={item.thumbnail}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {item.variant?.product?.title || item.title || "Item"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {item.variant?.title && <span className="mr-2">{item.variant.title}</span>}
+                            Qty: {item.quantity}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${
+                      order.fulfillment_status === "delivered" || order.fulfillment_status === "partially_delivered"
+                        ? "bg-green-50 text-green-700"
+                        : "bg-blue-50 text-blue-700"
+                    }`}>
+                      {(order.fulfillment_status || "").replace(/_/g, " ")}
+                    </span>
+                  </div>
                 </div>
 
                 {allLinks.length > 0 && (
@@ -871,7 +902,9 @@ function ReturnsSection({
   const [submittedReturns, setSubmittedReturns] = useState<string[]>([]);
 
   const returnableOrders = orders.filter(
-    (o) => o.fulfillment_status === "delivered" || o.fulfillment_status === "shipped"
+    (o) =>
+      o.fulfillment_status === "delivered" || o.fulfillment_status === "shipped" ||
+      o.fulfillment_status === "fulfilled" || o.fulfillment_status === "partially_fulfilled"
   );
   const pastOrders = orders.filter(
     (o) => o.fulfillment_status !== "delivered" && o.fulfillment_status !== "shipped"
@@ -954,37 +987,49 @@ function ReturnsSection({
       )}
 
       {customer && returnableOrders.map((o) => {
-        const firstItem = o.items?.[0];
+        const items = o.items || [];
         return (
           <div key={o.id} className="bg-white border border-gray-200 mb-4">
-            <div className="flex items-center gap-4 p-4">
-              <div className="w-[52px] h-[65px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                {firstItem?.thumbnail ? (
-                  <img src={firstItem.thumbnail} alt="" className="w-full h-full object-cover" />
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-gray-400">Order #{o.display_id}</p>
+                {submittedReturns.includes(o.id) ? (
+                  <span className="text-[10px] text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium flex-shrink-0">
+                    Return requested
+                  </span>
                 ) : (
-                  <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
+                <button
+                  onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}
+                  className="text-xs font-medium uppercase tracking-wider border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors flex-shrink-0"
+                >
+                  {expandedOrder === o.id ? "Cancel" : "Return"}
+                </button>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-400 mb-0.5">Order #{o.display_id}</p>
-                <p className="text-sm font-medium truncate">
-                  {firstItem?.variant?.product?.title || firstItem?.title || `Order #${o.display_id}`}
-                </p>
-                <p className="text-xs text-gray-500 capitalize mb-1">{(o.fulfillment_status || "").replace(/_/g, " ")}</p>
-                <ReturnInfo orderId={o.id} />
+              <div className="space-y-2 mb-3">
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center gap-3">
+                    <div className="w-[40px] h-[50px] bg-gray-50 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-sm">
+                      {item.thumbnail ? (
+                        <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-[9px] text-gray-300 font-medium tracking-widest">MV</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {item.variant?.product?.title || item.title || "Item"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {item.variant?.title && <span className="mr-2">{item.variant.title}</span>}
+                        Qty: {item.quantity}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              {submittedReturns.includes(o.id) ? (
-                <span className="text-[10px] text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium flex-shrink-0">
-                  Return requested
-                </span>
-              ) : (
-              <button
-                onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}
-                className="text-xs font-medium uppercase tracking-wider border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors flex-shrink-0"
-              >
-                {expandedOrder === o.id ? "Cancel" : "Return"}
-              </button>
-              )}
+              <p className="text-xs text-gray-500 capitalize mb-1">{(o.fulfillment_status || "").replace(/_/g, " ")}</p>
+              <ReturnInfo orderId={o.id} />
             </div>
 
             {expandedOrder === o.id && (
