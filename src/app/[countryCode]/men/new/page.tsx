@@ -1,4 +1,4 @@
-import { getProducts, getCollectionByHandle, getProductsByCollection } from "../../../lib/medusa/products";
+import { getProducts, getCollectionByHandle, getProductsByCollection } from "../../../../lib/medusa/products";
 import { getRegionId } from "@/lib/region";
 import FilterSortDrawer from "./FilterSortDrawer";
 import ProductCard, { type ProductCardData } from "@/components/product/ProductCard";

@@ -1,9 +1,10 @@
-import CollectionPage from "../../[gender]/[[...subcategory]]/page";
-
-export default async function MenCollectionPage({ params, searchParams }: { params: Promise<{ subcategory?: string[] }>; searchParams?: Promise<{ sort?: string }> }) {
+// This file was a wrapper for the deleted [gender] route
+// It needs to be recreated with proper collection logic
+export default async function MenCollectionPage({ params }: { params: Promise<{ subcategory?: string[] }> }) {
   const resolvedParams = await params;
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const wrappedParams = Promise.resolve({ gender: "men", subcategory: resolvedParams.subcategory });
-  const wrappedSearchParams = resolvedSearchParams ? Promise.resolve(resolvedSearchParams) : undefined;
-  return <CollectionPage params={wrappedParams} searchParams={wrappedSearchParams} />;
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p>Men collection page - subcategory: {resolvedParams.subcategory?.join('/') || 'all'}</p>
+    </div>
+  );
 }
