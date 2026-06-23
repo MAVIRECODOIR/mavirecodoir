@@ -1,8 +1,8 @@
 import { getProducts } from "../../../lib/medusa/products";
 import type { CatalogProduct } from "../types/catalog.types";
 
-export async function getFeaturedProducts(first = 8): Promise<CatalogProduct[]> {
-  const products = await getProducts();
+export async function getFeaturedProducts(first = 8, regionId?: string): Promise<CatalogProduct[]> {
+  const products = await getProducts(regionId);
 
   return products.slice(0, first).map((product: any) => ({
     id: product.id || "",

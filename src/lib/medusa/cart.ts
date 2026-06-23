@@ -112,3 +112,15 @@ export async function removeFromCart(cartId: string, lineItemId: string) {
     throw new Error("Failed to remove item from cart")
   }
 }
+
+export async function updateCartRegion(cartId: string, regionId: string) {
+  try {
+    const { cart } = await sdk.store.cart.update(cartId, {
+      region_id: regionId,
+    })
+    return cart
+  } catch (error) {
+    console.error("Error updating cart region in Medusa:", error)
+    throw new Error("Failed to update cart region")
+  }
+}

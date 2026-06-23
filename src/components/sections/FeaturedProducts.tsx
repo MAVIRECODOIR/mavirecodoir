@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
-import { getFeaturedProducts } from "@/lib/medusa/products";
+import { getFeaturedProducts } from "@/features/catalog/services/getFeaturedProducts";
 import { formatPrice } from "@/lib/utils/format";
+import Cookies from "js-cookie";
 
 interface Product {
   id: string;
@@ -86,7 +87,8 @@ export default function FeaturedProducts() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const featuredProducts = await getFeaturedProducts();
+        const regionId = Cookies.get("region_id");
+        const featuredProducts = await getFeaturedProducts(8, regionId);
         setProducts(featuredProducts);
       } catch (error) {
         console.error("Error fetching featured products:", error);

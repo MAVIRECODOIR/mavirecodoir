@@ -46,6 +46,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     getCart(cartId).then(setCart).catch(() => setCart(null))
   }, [cartId])
 
+  useEffect(() => {
+    const handleRegionChange = () => {
+      if (cartId) {
+        console.log("Region changed, refetching cart...")
+        getCart(cartId).then(setCart).catch(() => setCart(null))
+      }
+    }
+
+    window.addEventListener('cart-region-changed', handleRegionChange)
+    return () => window.removeEventListener('cart-region-changed', handleRegionChange)
+  }, [cartId])
+
   const ensureCart = useCallback(async () => {
     if (cartId) return cartId
     const prefs = readLocalePrefs()

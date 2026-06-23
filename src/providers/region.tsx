@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import Cookies from "js-cookie"
 import sdk from "@/lib/medusa/client"
+import { updateCartRegion } from "@/lib/medusa/cart"
 
 type StoreRegion = {
   id: string
@@ -60,10 +61,29 @@ function findRegionForCountry(regions: StoreRegion[], countryCode: string): Stor
 
 export const RegionProvider = ({ children }: RegionProviderProps) => {
   const [region, setRegion] = useState<StoreRegion>()
+  const [previousRegionId, setPreviousRegionId] = useState<string>()
 
   useEffect(() => {
     if (region) {
       Cookies.set("region_id", region.id, { expires: 30 })
+      
+      // Update cart region if region changed
+      if (previousRegionId && previousRegionId !== region.id) {
+        const cartId = localStorage.getItem("medusa_cart_id")
+        if (cartId) {
+          console.log("Updating cart region from", previousRegionId, "to", region.id)
+          updateCartRegion(cartId, region.id)
+            .then(() => {
+              console.log("Cart region updated successfully")
+              // Trigger cart refetch by dispatching custom event
+              window.dispatchEvent(new CustomEvent('cart-region-changed'))
+            })
+            .catch((error) => {
+              console.error("Failed to update cart region:", error)
+            })
+        }
+      }
+      setPreviousRegionId(region.id)
       return
     }
 
@@ -72,8 +92,8 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
       // First, detect user's country and find matching region
       detectUserCountry()
         .then(async (countryCode) => {
-          const { regions } = await sdk.store.region.list()
-          console.log("Available regions:", regions?.map((r: any) => ({ name: r.name, currency: r.currency_code })))
+          const { regions } = await sdk.store.region.list({ fields: "*,*countries" } as any)
+          console.log("Available regions:", regions?.map((r: any) => ({ name: r.name, currency: r.currency_code, countries: r.countries?.map((c: any) => c.iso_2) })))
           if (regions && regions.length > 0) {
             // Try to find region matching user's country
             if (countryCode) {
@@ -95,7 +115,7 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
         .catch((error) => {
           console.error("Error in region detection:", error)
           // Fallback to fetching first region
-          sdk.store.region.list()
+          sdk.store.region.list({ fields: "*,*countries" } as any)
             .then(({ regions }) => {
               if (regions && regions.length > 0) {
                 const gbpRegion = regions.find((r: StoreRegion) => r.currency_code.toLowerCase() === "gbp")
@@ -124,7 +144,7 @@ export const RegionProvider = ({ children }: RegionProviderProps) => {
             })
         })
     }
-  }, [region])
+  }, [region, previousRegionId])
 
   return (
     <RegionContext.Provider value={{ region, setRegion }}>

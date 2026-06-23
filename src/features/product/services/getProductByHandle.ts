@@ -27,8 +27,8 @@ type MedusaProduct = {
   metadata?: Record<string, any> | null;
 };
 
-export async function getProductByHandle(handle: string): Promise<ProductDetail | null> {
-  const product = await getMedusaProductByHandle(handle) as MedusaProduct | null;
+export async function getProductByHandle(handle: string, regionId?: string): Promise<ProductDetail | null> {
+  const product = await getMedusaProductByHandle(handle, regionId) as MedusaProduct | null;
 
   if (!product) {
     return null;
