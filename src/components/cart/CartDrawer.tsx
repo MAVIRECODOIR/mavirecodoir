@@ -53,7 +53,7 @@ export default function CartDrawer() {
 
   const items = cart?.items || [];
   const currency = cart?.region?.currency_code || "GBP";
-  const subtotal = cart?.subtotal || 0;
+  const subtotal = items.reduce((sum: number, item: any) => sum + (item.unit_price || 0) * item.quantity, 0);
   const itemCount = items.length;
 
   const handleQuantity = async (lineItemId: string, newQty: number) => {
