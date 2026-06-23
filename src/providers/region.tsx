@@ -33,23 +33,45 @@ type RegionProviderProps = {
   children: React.ReactNode
 }
 
-// Detect user's country from IP using free geolocation API
+// Detect user's country from IP using multiple geolocation APIs with fallbacks
 async function detectUserCountry(): Promise<string | null> {
-  try {
-    console.log("Detecting user country...")
-    const response = await fetch("https://ipapi.co/json/")
-    if (!response.ok) {
-      console.error("IP API response not OK:", response.status)
-      return null
+  const apis = [
+    {
+      name: "ipapi.co",
+      url: "https://ipapi.co/json/",
+      extract: (data: any) => data.country_code?.toLowerCase()
+    },
+    {
+      name: "ipwho.is",
+      url: "https://ipwho.is/",
+      extract: (data: any) => data.country_code?.toLowerCase()
+    },
+    {
+      name: "ip-api.com",
+      url: "http://ip-api.com/json/",
+      extract: (data: any) => data.countryCode?.toLowerCase()
     }
-    const data = await response.json()
-    const countryCode = data.country_code?.toLowerCase() || null
-    console.log("Detected country code:", countryCode)
-    return countryCode
-  } catch (error) {
-    console.error("Error detecting country:", error)
-    return null
+  ]
+
+  for (const api of apis) {
+    try {
+      console.log(`Detecting user country using ${api.name}...`)
+      const response = await fetch(api.url)
+      if (!response.ok) {
+        console.error(`${api.name} response not OK:`, response.status)
+        continue
+      }
+      const data = await response.json()
+      const countryCode = api.extract(data)
+ console.log(`${api.name} detected country code:`, countryCode)
+      if (countryCode) return countryCode
+    } catch (error) {
+      console.error(`Error detecting country with ${api.name}:`, error)
+    }
   }
+
+  console.error("All geolocation APIs failed")
+  return null
 }
 
 // Find region that contains the user's country
