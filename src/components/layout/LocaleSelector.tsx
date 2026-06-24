@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { LOCALES, readLocalePrefs, saveLocalePrefs } from "@/lib/locale";
 import type { LocalePreferences } from "@/lib/locale";
+import Cookies from "js-cookie";
 
 const CURRENCY_SYMBOLS: Record<string, string> = { GBP: "£", USD: "$", EUR: "€" };
 
@@ -62,6 +63,8 @@ export default function LocaleSelector() {
     setPrefs(newPrefs);
     setIsOpen(false);
     const localeCode = code.replace("-", "_").toLowerCase()
+    Cookies.set("preferred_locale", localeCode, { path: "/", expires: 365 })
+    Cookies.set("preferred_country", locale.countryCode.toLowerCase(), { path: "/", expires: 365 })
     const currentPath = window.location.pathname
     const segments = currentPath.split("/").filter(Boolean)
     if (segments.length >= 2) {

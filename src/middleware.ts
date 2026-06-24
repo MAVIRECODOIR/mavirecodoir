@@ -33,6 +33,13 @@ function detectLocale(request: NextRequest, countryCode: string): string {
   return getDefaultLocale(countryCode as any)
 }
 
+function redirectWithCookies(destination: string, request: NextRequest, country: string, locale: string) {
+  const response = NextResponse.redirect(new URL(destination, request.url))
+  response.cookies.set('preferred_country', country, { maxAge: 60 * 60 * 24 * 365, path: '/' })
+  response.cookies.set('preferred_locale', locale, { maxAge: 60 * 60 * 24 * 365, path: '/' })
+  return response
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -58,14 +65,14 @@ export function middleware(request: NextRequest) {
     const locale = detectLocale(request, country)
     const rest = segments.slice(1).join('/')
     const destination = rest ? `/${country}/${locale}/${rest}` : `/${country}/${locale}`
-    return NextResponse.redirect(new URL(destination, request.url))
+    return redirectWithCookies(destination, request, country, locale)
   }
 
   const country = detectCountry(request)
   const locale = detectLocale(request, country)
   const rest = segments.join('/')
   const destination = rest ? `/${country}/${locale}/${rest}` : `/${country}/${locale}`
-  return NextResponse.redirect(new URL(destination, request.url))
+  return redirectWithCookies(destination, request, country, locale)
 }
 
 export const config = {

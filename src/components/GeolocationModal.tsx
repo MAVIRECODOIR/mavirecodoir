@@ -62,11 +62,17 @@ export default function GeolocationModal() {
     }
   }, [currentCountryCode])
 
+  const setCountryCookie = (country: string, locale: string) => {
+    document.cookie = `preferred_country=${country};path=/;max-age=${60 * 60 * 24 * 365}`
+    document.cookie = `preferred_locale=${locale};path=/;max-age=${60 * 60 * 24 * 365}`
+  }
+
   const handleGoToDetected = () => {
     if (detectedCountry) {
       localStorage.setItem('preferred_country', detectedCountry)
       localStorage.setItem('geolocation_dismissed', 'true')
       const locale = getDefaultLocale(detectedCountry as CountryCode)
+      setCountryCookie(detectedCountry, locale)
       router.push(`/${detectedCountry}/${locale}`)
     }
   }
@@ -74,6 +80,7 @@ export default function GeolocationModal() {
   const handleConfirm = () => {
     localStorage.setItem('preferred_country', currentCountryCode)
     localStorage.setItem('geolocation_dismissed', 'true')
+    setCountryCookie(currentCountryCode, getDefaultLocale(currentCountryCode as CountryCode))
     setShowModal(false)
     setDismissed(true)
   }
