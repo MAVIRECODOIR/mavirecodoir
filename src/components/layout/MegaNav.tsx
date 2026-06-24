@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import Backdrop from "../ui/Backdrop";
 import LocalizedLink from "../LocalizedLink";
+import { useTranslations } from "next-intl";
 
 /* ─── Chevron arrow icon ─── */
 function ChevronIcon({ className, size = 16 }: { className?: string; size?: number }) {
@@ -28,10 +29,11 @@ function ChevronIcon({ className, size = 16 }: { className?: string; size?: numb
 
 /* ─── Animated close X ─── */
 function CloseX({ onClick, isMobile }: { onClick: () => void; isMobile: boolean }) {
+  const t = useTranslations("common");
   return (
     <button
       onClick={onClick}
-      aria-label="Close navigation"
+      aria-label={t("close")}
       className="flex items-center gap-1.5 relative z-[302] p-0 m-0 border-0 bg-transparent cursor-pointer"
       style={{
         font: `500 ${isMobile ? 17 : 14}px/${isMobile ? 21 : 17}px inherit`,
@@ -71,7 +73,7 @@ function CloseX({ onClick, isMobile }: { onClick: () => void; isMobile: boolean 
           />
         </svg>
       </span>
-      <span>Close</span>
+      <span>{t("close")}</span>
     </button>
   );
 }
@@ -165,6 +167,8 @@ type MegaNavProps = {
 
 export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist }: MegaNavProps) {
   const router = useRouter();
+  const t = useTranslations("nav");
+  const tc = useTranslations("common");
   const [activeL1, setActiveL1] = useState<number | null>(null);
   const [visible, setVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(isOpen);
@@ -209,20 +213,20 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
 
   const BOTTOM_LINKS = isLoggedIn
     ? [
-        { label: "Shopping Bag", href: "/cart",                   icon: "bag"      as const },
-        { label: "Wishlist",     href: "#wishlist",               icon: "wishlist" as const },
-        { label: "My Account",  href: "/client/my-account",      icon: "account"  as const },
-        { label: "Search",      href: "#search",                  icon: "search"   as const },
-        { label: "My Orders",   href: "/client/my-account" },
-        { label: "Contact Us",  href: "/contact" },
+        { label: t("cart"),         href: "/cart",              icon: "bag"      as const },
+        { label: "Wishlist",        href: "#wishlist",          icon: "wishlist" as const },
+        { label: t("account"),      href: "/client/my-account", icon: "account"  as const },
+        { label: t("search"),       href: "#search",            icon: "search"   as const },
+        { label: "My Orders",       href: "/client/my-account" },
+        { label: t("contact"),      href: "/contact" },
       ]
     : [
-        { label: "Shopping Bag", href: "/cart",                   icon: "bag"      as const },
-        { label: "Wishlist",     href: "#wishlist",               icon: "wishlist" as const },
-        { label: "My Account",  href: "/client/sign-up",         icon: "account"  as const },
-        { label: "Search",      href: "#search",                  icon: "search"   as const },
-        { label: "Sign In",     href: "/client/sign-up" },
-        { label: "Contact Us",  href: "/contact" },
+        { label: t("cart"),         href: "/cart",              icon: "bag"      as const },
+        { label: "Wishlist",        href: "#wishlist",          icon: "wishlist" as const },
+        { label: t("account"),      href: "/client/sign-up",   icon: "account"  as const },
+        { label: t("search"),       href: "#search",            icon: "search"   as const },
+        { label: "Sign In",         href: "/client/sign-up" },
+        { label: t("contact"),      href: "/contact" },
       ];
 
   /* Stagger the visibility so CSS transitions can play */

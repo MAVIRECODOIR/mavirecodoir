@@ -1,6 +1,5 @@
-import { RegionProvider } from "@/providers/region"
-import sdk from "@/lib/medusa/client"
-import GeolocationModal from "@/components/GeolocationModal"
+import { notFound } from 'next/navigation'
+import { ALL_COUNTRY_CODES } from '@/config/regions'
 
 export default async function CountryLayout({
   children,
@@ -10,14 +9,10 @@ export default async function CountryLayout({
   params: Promise<{ countryCode: string }>
 }) {
   const { countryCode } = await params
-  
-  // Fetch regions ONCE at layout level — all child pages inherit this
-  const { regions } = await sdk.store.region.list({ fields: "*,*countries" } as any)
 
-  return (
-    <RegionProvider countryCode={countryCode} regions={regions || []}>
-      {children}
-      <GeolocationModal />
-    </RegionProvider>
-  )
+  if (!(ALL_COUNTRY_CODES as string[]).includes(countryCode)) {
+    notFound()
+  }
+
+  return <>{children}</>
 }

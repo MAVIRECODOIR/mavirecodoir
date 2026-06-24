@@ -10,6 +10,7 @@ import LocalizedLink from "../LocalizedLink";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
 import { ALL_COUNTRY_CODES } from "@/config/regions";
+import { useTranslations } from "next-intl";
 
 function stripLocale(path: string): string {
   const segs = path.split("/").filter(Boolean)
@@ -111,6 +112,8 @@ export default function Header() {
   const locale = (params?.locale as string) || ""
   const stripPath = stripLocale(pathname)
   const isHomePage = stripPath === "/";
+  const tnav = useTranslations("nav");
+  const tc = useTranslations("common");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -342,7 +345,7 @@ export default function Header() {
   const contactBtn = (
     <button
       className="mavire-btn-motion flex items-center gap-1 h-full"
-      aria-label="Contact Us"
+      aria-label={tnav("contact")}
     >
       <ContactPlusIcon color="#000" />
       <span
@@ -353,7 +356,7 @@ export default function Header() {
           color: "#000",
         }}
       >
-        Contact Us
+        {tnav("contact")}
       </span>
     </button>
   );
@@ -589,13 +592,13 @@ export default function Header() {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search"
-                className="flex-1 ml-3 text-base font-medium tracking-wider outline-none bg-transparent"
-              />
-              <button
-                onClick={() => setIsSearchOpen(false)}
-                className="mavire-btn-motion p-2"
-                aria-label="Close search"
+                placeholder={tnav("search")}
+                 className="flex-1 ml-3 text-base font-medium tracking-wider outline-none bg-transparent"
+               />
+               <button
+                 onClick={() => setIsSearchOpen(false)}
+                 className="mavire-btn-motion p-2"
+                 aria-label={tc("close")}
               >
                 <CloseIcon />
               </button>
@@ -689,7 +692,7 @@ export default function Header() {
           <div className="hidden md:flex items-center h-full" style={{ width: headerSideWidth }}>
             <button
               className="mavire-btn-motion flex items-center gap-1 h-full"
-              aria-label="Contact Us"
+              aria-label={tnav("contact")}
               style={{
                 opacity: collapsed ? 1 : 0,
                 pointerEvents: collapsed ? "auto" : "none",
@@ -705,7 +708,7 @@ export default function Header() {
                   color: "#000",
                 }}
               >
-                Contact Us
+                {tnav("contact")}
               </span>
             </button>
           </div>
@@ -737,13 +740,13 @@ export default function Header() {
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Search"
+                  placeholder={tnav("search")}
                   className="flex-1 ml-3 text-base font-medium tracking-wider outline-none bg-transparent"
                 />
                 <button
                   onClick={closeSearch}
                   className="mavire-btn-motion p-2"
-                  aria-label="Close search"
+                  aria-label={tc("close")}
                 >
                   <CloseIcon />
                 </button>

@@ -2,6 +2,9 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { isValidPair } from '@/config/regions'
+import sdk from '@/lib/medusa/client'
+import { RegionProvider } from '@/providers/region'
+import GeolocationModal from '@/components/GeolocationModal'
 
 export default async function LocaleLayout({
   children,
@@ -17,10 +20,14 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages()
+  const { regions } = await sdk.store.region.list({ fields: "*,*countries" } as any)
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      {children}
+      <RegionProvider countryCode={countryCode} regions={regions || []}>
+        {children}
+        <GeolocationModal />
+      </RegionProvider>
     </NextIntlClientProvider>
   )
 }

@@ -15,8 +15,14 @@ const BARE_PREFIXES: string[] = [];
 export default function LayoutShell({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? "/";
   const isBare = BARE_PREFIXES.some((p) => pathname.startsWith(p));
-  const isMinimalFlow = pathname === "/cart" || pathname === "/checkout" || pathname.startsWith("/order");
-  const isClient = pathname.startsWith("/client");
+
+  // Strip /[countryCode]/[locale]/ prefix to check the actual page route
+  const segments = pathname.split("/").filter(Boolean);
+  const routePath = segments.length >= 3 ? "/" + segments.slice(2).join("/") : pathname;
+  const routeSeg = segments.length >= 3 ? segments[2] : segments[0] || "";
+
+  const isMinimalFlow = routePath === "/cart" || routePath === "/checkout" || routeSeg === "order";
+  const isClient = routeSeg === "client";
 
   if (isBare) {
     return <>{children}</>;

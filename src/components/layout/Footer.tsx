@@ -4,58 +4,63 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import LocaleSelector from "./LocaleSelector";
 import LocalizedLink from "../LocalizedLink";
-
-const FOOTER_COLUMNS = [
-  {
-    title: "Client Services",
-    links: [
-      { label: "Contact Us", href: "/contact" },
-      { label: "FAQs", href: "/faq" },
-      { label: "Shipping & Returns", href: "/shipping" },
-      { label: "Book an Appointment", href: "/appointment" },
-      { label: "Collect in Store", href: "/collect-in-store" },
-    ],
-  },
-  {
-    title: "The House",
-    links: [
-      { label: "Our Story", href: "/about" },
-      { label: "Craftsmanship", href: "/craftsmanship" },
-      { label: "Sustainability", href: "/sustainability" },
-      { label: "Careers", href: "/careers" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { label: "Terms & Conditions", href: "/terms" },
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Cookie Policy", href: "/cookies" },
-      { label: "Accessibility", href: "/accessibility" },
-    ],
-  },
-  {
-    title: "Find Us",
-    links: [
-      { label: "Store Locator", href: "/stores" },
-      { label: "Instagram", href: "https://instagram.com" },
-      { label: "Facebook", href: "https://facebook.com" },
-      { label: "Pinterest", href: "https://pinterest.com" },
-      { label: "YouTube", href: "https://youtube.com" },
-    ],
-  },
-];
 
 export default function Footer() {
   const pathname = usePathname() ?? "/";
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const t = useTranslations("footer");
+  const tc = useTranslations("common");
 
-  if (pathname === "/cart" || pathname === "/checkout") {
+  const segments = pathname.split("/").filter(Boolean);
+  const routeSeg = segments.length >= 3 ? segments[2] : segments[0] || "";
+  if (routeSeg === "cart" || routeSeg === "checkout" || routeSeg === "order") {
     return null;
   }
+
+  const FOOTER_COLUMNS = [
+    {
+      title: t("client_services"),
+      links: [
+        { label: t("contact_us"), href: "/contact" },
+        { label: t("faqs"), href: "/faq" },
+        { label: t("shipping_returns"), href: "/shipping" },
+        { label: t("book_appointment"), href: "/appointment" },
+        { label: t("collect_in_store"), href: "/collect-in-store" },
+      ],
+    },
+    {
+      title: t("the_house"),
+      links: [
+        { label: t("our_story"), href: "/about" },
+        { label: t("craftsmanship"), href: "/craftsmanship" },
+        { label: t("sustainability"), href: "/sustainability" },
+        { label: t("careers"), href: "/careers" },
+      ],
+    },
+    {
+      title: t("legal"),
+      links: [
+        { label: t("terms"), href: "/terms" },
+        { label: t("privacy"), href: "/privacy" },
+        { label: t("cookies"), href: "/cookies" },
+        { label: t("accessibility"), href: "/accessibility" },
+      ],
+    },
+    {
+      title: t("find_us"),
+      links: [
+        { label: t("store_locator"), href: "/stores" },
+        { label: "Instagram", href: "https://instagram.com" },
+        { label: "Facebook", href: "https://facebook.com" },
+        { label: "Pinterest", href: "https://pinterest.com" },
+        { label: "YouTube", href: "https://youtube.com" },
+      ],
+    },
+  ];
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,11 +89,10 @@ export default function Footer() {
       <div className="border-b border-white/10">
         <div className="luxury-container py-16 md:py-20 flex flex-col items-center text-center">
           <h3 className="luxury-heading-lg text-white mb-4">
-            Stay Connected
+            {t("stay_connected")}
           </h3>
           <p className="luxury-body text-white/60 mb-8 max-w-md">
-            Subscribe to receive updates on new collections, exclusive events,
-            and personalised recommendations.
+            {t("newsletter_desc")}
           </p>
           <form onSubmit={handleSubscribe} className="flex w-full max-w-md">
             <input
@@ -103,14 +107,14 @@ export default function Footer() {
               disabled={status === "loading"}
               className="ml-4 luxury-caption text-white/80 hover:text-white transition-colors whitespace-nowrap disabled:opacity-50"
             >
-              {status === "loading" ? "Subscribing..." : status === "success" ? "Subscribed" : "Subscribe"}
+              {status === "loading" ? t("subscribing") : status === "success" ? t("subscribed") : t("subscribe")}
             </button>
           </form>
           {status === "success" && (
-            <p className="text-green-300 text-xs mt-2">Thank you for subscribing!</p>
+            <p className="text-green-300 text-xs mt-2">{t("thank_you")}</p>
           )}
           {status === "error" && (
-            <p className="text-red-300 text-xs mt-2">Something went wrong. Try again.</p>
+            <p className="text-red-300 text-xs mt-2">{t("error_try_again")}</p>
           )}
         </div>
       </div>
@@ -143,7 +147,6 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="luxury-container py-8 flex flex-col md:flex-row items-center gap-4 relative">
-          {/* Logo - positioned absolutely on left */}
           <div className="absolute left-8 top-[55%] -translate-y-1/2 flex items-center">
             <LocalizedLink href="/" aria-label="MAVIRE CODOIR - go to homepage">
               <Image
@@ -158,14 +161,12 @@ export default function Footer() {
             </LocalizedLink>
           </div>
 
-          {/* Center content - copyright */}
           <div className="flex-1 flex justify-center">
             <p className="text-[11px] tracking-[0.05em] text-white/40">
-              &copy; {new Date().getFullYear()} MAVIRE. All rights reserved.
+              {t("copyright")}
             </p>
           </div>
 
-          {/* Country/Language Selector - positioned absolutely on right */}
           <div className="absolute right-8 top-[55%] -translate-y-1/2 flex items-center">
             <LocaleSelector />
           </div>
