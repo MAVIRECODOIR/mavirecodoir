@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { getDefaultLocale } from "@/config/regions"
+import type { CountryCode } from "@/config/regions"
 
 const COUNTRY_NAMES: Record<string, string> = {
   gb: "United Kingdom",
@@ -64,7 +66,7 @@ export default function GeolocationModal() {
     if (detectedCountry) {
       localStorage.setItem('preferred_country', detectedCountry)
       localStorage.setItem('geolocation_dismissed', 'true')
-      const locale = (params?.locale as string) || 'en_gb'
+      const locale = getDefaultLocale(detectedCountry as CountryCode)
       router.push(`/${detectedCountry}/${locale}`)
     }
   }

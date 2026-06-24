@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ALL_COUNTRY_CODES, REGIONS, DEFAULT_COUNTRY, getDefaultLocale } from '@/config/regions'
 
+const EU_COUNTRIES = ['de','fr','it','es','nl','be','at','dk','se','fi','no','pl','cz','hu','ro','gr','pt','ie']
+
 function detectCountry(request: NextRequest): string {
   const saved = request.cookies.get('preferred_country')?.value
   if (saved && (ALL_COUNTRY_CODES as string[]).includes(saved)) return saved
+
+  const geo = (request as any).geo?.country?.toLowerCase()
+  if (geo === 'gb') return 'gb'
+  if (geo === 'us') return 'us'
+  if (geo === 'ca') return 'ca'
+  if (geo && EU_COUNTRIES.includes(geo)) return 'eu'
 
   const locale = (request.headers.get('accept-language') || '')
     .split(',')[0].toLowerCase()
@@ -11,7 +19,7 @@ function detectCountry(request: NextRequest): string {
   if (locale.includes('-gb')) return 'gb'
   if (locale.includes('-us')) return 'us'
   if (locale.includes('-ca')) return 'ca'
-  if (/-(de|fr|it|es|nl|be|at|dk|se|fi|no|pl|cz|hu|ro|gr|pt|ie)/.test(locale)) return 'eu'
+  if (EU_COUNTRIES.some((c) => locale.includes(`-${c}`))) return 'eu'
 
   return DEFAULT_COUNTRY
 }

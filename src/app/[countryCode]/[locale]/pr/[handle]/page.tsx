@@ -14,5 +14,5 @@ export default async function ProductRoute({ params }: ProductRouteProps) {
   )
   
   const regionId = region?.id
-  return ProductPage({ handle, regionId, locale });
+  return ProductPage({ handle, regionId, locale, countryCode });
 }

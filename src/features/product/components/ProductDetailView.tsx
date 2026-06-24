@@ -1,19 +1,20 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
 import { addToCart } from "@/lib/medusa/cart";
-import { readLocalePrefs } from "@/lib/locale";
 import type { ProductionStatus } from "../types/product.types";
 import type { ProductDetail, ProductImage } from "../types/product.types";
 import type { WishlistItem } from "@/lib/wishlist";
+import { REGIONS } from "@/config/regions";
 import { formatPrice } from "@/lib/utils/format";
 
 type ProductDetailViewProps = {
   product: ProductDetail;
   locale?: string;
+  countryCode?: string;
 };
 
 type TabKey = "description" | "size" | "contact" | "delivery";
@@ -85,15 +86,10 @@ function resolveStatus(variant: ProductDetail["variants"][number], product: Prod
   return metaStatus ?? "in_stock";
 }
 
-export function ProductDetailView({ product, locale }: ProductDetailViewProps) {
+export function ProductDetailView({ product, locale, countryCode }: ProductDetailViewProps) {
   const router = useRouter();
-  const { ensureCart } = useCart();
-  const [userCurrency, setUserCurrency] = useState("GBP");
-
-  useEffect(() => {
-    const prefs = readLocalePrefs();
-    setUserCurrency(prefs.currency);
-  }, []);
+  const { ensureCart, openCart, refetchCart } = useCart();
+  const userCurrency = (countryCode && REGIONS[countryCode as keyof typeof REGIONS]?.currency) ?? 'GBP'
 
   const uniqueColors = useMemo(() => {
     const set = new Set<string>();
@@ -219,7 +215,8 @@ export function ProductDetailView({ product, locale }: ProductDetailViewProps) {
     try {
       const cartId = await ensureCart();
       await addToCart(cartId, selectedVariantId, 1);
-      router.push("/cart");
+      await refetchCart();
+      openCart();
     } catch {
       alert("Failed to add item to cart.");
     } finally {
