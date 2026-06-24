@@ -3,18 +3,25 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useCart } from "@/lib/medusa/cart-context";
 import { updateCartItem, removeFromCart } from "@/lib/medusa/cart";
+import { completeCart } from "@/lib/medusa/checkout";
+import PayPalButton from "@/components/checkout/PayPalButton";
 import { formatPrice } from "@/lib/utils/format";
 import Backdrop from "@/components/ui/Backdrop";
+
+const MAX_QTY = 2;
 
 export default function CartDrawer() {
   const { isCartOpen, closeCart, cart, refetchCart } = useCart();
   const router = useRouter();
+  const params = useParams();
+  const countryCode = (params?.countryCode as string) || "";
   const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [paypalProcessing, setPaypalProcessing] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -58,6 +65,10 @@ export default function CartDrawer() {
 
   const handleQuantity = async (lineItemId: string, newQty: number) => {
     if (newQty < 1) return;
+    if (newQty > MAX_QTY) {
+      showToast(`Maximum ${MAX_QTY} per item`);
+      return;
+    }
     try {
       await updateCartItem(cart.id, lineItemId, newQty);
       await refetchCart();
@@ -84,6 +95,36 @@ export default function CartDrawer() {
     closeCart();
     router.push(href);
   }, [closeCart, router]);
+
+  const handlePayPalComplete = useCallback(async () => {
+    if (!cart?.id) return;
+    setPaypalProcessing(true);
+    try {
+      const result = await completeCart(cart.id);
+      if (result.type === "order") {
+        const id = (result as any).order.id;
+        localStorage.removeItem("medusa_cart_id");
+        let token = "";
+        try {
+          const tokenRes = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order_id: id }),
+          });
+          const tokenData = await tokenRes.json();
+          token = tokenData.token || "";
+        } catch {}
+        closeCart();
+        router.push(`/${countryCode}/order/${id}${token ? `?token=${token}` : ""}`);
+      } else {
+        showToast("Payment could not be completed.");
+      }
+    } catch {
+      showToast("Payment failed.");
+    } finally {
+      setPaypalProcessing(false);
+    }
+  }, [cart, countryCode, closeCart, router, showToast]);
 
   if (!isMounted) return null;
 
@@ -213,8 +254,9 @@ export default function CartDrawer() {
                           </span>
                           <button
                             onClick={() => handleQuantity(item.id, item.quantity + 1)}
+                            disabled={item.quantity >= MAX_QTY}
                             aria-label="Increase quantity"
-                            style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 10px", fontSize: 14, color: "#000", lineHeight: 1 }}
+                            style={{ background: "none", border: "none", cursor: item.quantity >= MAX_QTY ? "default" : "pointer", padding: "6px 10px", fontSize: 14, color: item.quantity >= MAX_QTY ? "#ccc" : "#000", lineHeight: 1 }}
                           >
                             +
                           </button>
@@ -259,14 +301,18 @@ export default function CartDrawer() {
               Checkout
             </button>
 
-            <button
-              onClick={() => navigateAndClose("/checkout?payment=paypal")}
-              style={{ width: "100%", border: "none", background: "rgb(0, 48, 135)", color: "#fff", fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", padding: "14px 0", cursor: "pointer", borderRadius: 2 }}
-            >
-              <span style={{ fontFamily: "system-ui, sans-serif", fontStyle: "italic", fontWeight: 700, letterSpacing: "0.02em" }}>
-                PayPal
-              </span>
-            </button>
+            {paypalProcessing ? (
+              <div style={{ width: "100%", textAlign: "center", padding: "14px 0", fontSize: 12, color: "#7B8487" }}>
+                Processing PayPal payment...
+              </div>
+            ) : (
+              <PayPalButton
+                cartId={cart.id}
+                onApprove={handlePayPalComplete}
+                onError={() => showToast("PayPal encountered an error.")}
+                sdkReady={false}
+              />
+            )}
 
             <p style={{ margin: "12px 0 0", textAlign: "center", fontWeight: 400, fontSize: 11, color: "rgb(123, 132, 135)", lineHeight: "15px" }}>
               Shipping, taxes, and discounts are calculated at checkout.

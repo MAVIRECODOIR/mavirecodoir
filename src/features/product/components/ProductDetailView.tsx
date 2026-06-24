@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useCallback } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
 import { addToCart } from "@/lib/medusa/cart";
+import { completeCart } from "@/lib/medusa/checkout";
+import PayPalButton from "@/components/checkout/PayPalButton";
 import type { ProductionStatus } from "../types/product.types";
 import type { ProductDetail, ProductImage } from "../types/product.types";
 import type { WishlistItem } from "@/lib/wishlist";
@@ -114,6 +116,38 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
   const [notifying, setNotifying] = useState(false);
   const [notified, setNotified] = useState(false);
   const [notifyError, setNotifyError] = useState("");
+  const [showPaypal, setShowPaypal] = useState(false);
+  const [paypalCartId, setPaypalCartId] = useState<string | null>(null);
+  const [paypalProcessing, setPaypalProcessing] = useState(false);
+  const params = useParams();
+  const paypalCountryCode = (params?.countryCode as string) || countryCode;
+
+  const handlePayPalComplete = useCallback(async () => {
+    if (!paypalCartId) return;
+    setPaypalProcessing(true);
+    try {
+      const result = await completeCart(paypalCartId);
+      if (result.type === "order") {
+        const id = (result as any).order.id;
+        localStorage.removeItem("medusa_cart_id");
+        let token = "";
+        try {
+          const tokenRes = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order_id: id }),
+          });
+          const tokenData = await tokenRes.json();
+          token = tokenData.token || "";
+        } catch {}
+        router.push(`/${paypalCountryCode}/order/${id}${token ? `?token=${token}` : ""}`);
+      }
+    } catch {
+      setShowPaypal(false);
+    } finally {
+      setPaypalProcessing(false);
+    }
+  }, [paypalCartId, paypalCountryCode, router]);
 
   const filteredVariants = useMemo(() => {
     if (!selectedColor) return product.variants;
@@ -229,7 +263,9 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
     try {
       const cartId = await ensureCart();
       await addToCart(cartId, selectedVariantId, 1);
-      router.push("/checkout");
+      await refetchCart();
+      setPaypalCartId(cartId);
+      setShowPaypal(true);
     } catch {
       alert("Failed to start checkout.");
     } finally {
@@ -508,19 +544,34 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
                   {/* PayPal Express */}
                   {(productionStatus === "in_stock" || productionStatus === "low_stock" || productionStatus === "pre_order") && (
                     <div className="mt-3">
-                      <button
-                        type="button"
-                        disabled={adding}
-                        onClick={handlePaypalCheckout}
-                        className="w-full border border-neutral-300 bg-white text-neutral-700 py-[13px] px-6 text-[11px] tracking-[0.1em] uppercase hover:border-neutral-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                      >
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="#003087">
-                          <path d="M19.016 4.087C17.44 2.625 15.374 2.07 12.99 2.07H5.387a.645.645 0 00-.637.546L2.025 17.586a.386.386 0 00.382.447h4.346l.523-3.312-.016.102a.645.645 0 01.637-.546h1.323c2.6 0 4.636-.52 5.37-2.027.18-.37.27-.66.348-.978.255-1.056.192-2.033.192-2.033s.045-1.206-.18-2.292c-.149-.717-.514-1.395-1.159-1.92a4.57 4.57 0 00-.256-.208c.078-.065.158-.126.235-.19h.003z"/>
-                          <path d="M20.721 7.289c-.175-.05-.355-.094-.536-.132a7.386 7.386 0 00-1.216-.159c-.914-.056-1.994-.04-3.263-.04H10.23a.41.41 0 00-.407.348l-.88 5.573-.03.158a.561.561 0 01.554-.48h1.15c2.26 0 4.376-.382 5.646-1.728.5-.53.78-1.2.997-1.886.14-.447.25-.92.323-1.422.005-.033.009-.066.013-.1.08-.454.11-.87.11-1.206a5.52 5.52 0 00-.053-.756v-.001z" opacity=".6"/>
-                        </svg>
-                        Pay with <span className="font-semibold tracking-normal">PayPal</span>
-                      </button>
-                      <p className="text-[10px] text-neutral-400 text-center mt-2">Express checkout with PayPal</p>
+                      {showPaypal && !paypalProcessing && paypalCartId ? (
+                        <PayPalButton
+                          cartId={paypalCartId}
+                          onApprove={handlePayPalComplete}
+                          onError={() => { setShowPaypal(false); setPaypalCartId(null); }}
+                          sdkReady={false}
+                        />
+                      ) : paypalProcessing ? (
+                        <div className="w-full text-center py-[13px] text-[11px] text-neutral-500">
+                          Processing PayPal payment...
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={adding}
+                          onClick={handlePaypalCheckout}
+                          className="w-full border border-neutral-300 bg-white text-neutral-700 py-[13px] px-6 text-[11px] tracking-[0.1em] uppercase hover:border-neutral-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="#003087">
+                            <path d="M19.016 4.087C17.44 2.625 15.374 2.07 12.99 2.07H5.387a.645.645 0 00-.637.546L2.025 17.586a.386.386 0 00.382.447h4.346l.523-3.312-.016.102a.645.645 0 01.637-.546h1.323c2.6 0 4.636-.52 5.37-2.027.18-.37.27-.66.348-.978.255-1.056.192-2.033.192-2.033s.045-1.206-.18-2.292c-.149-.717-.514-1.395-1.159-1.92a4.57 4.57 0 00-.256-.208c.078-.065.158-.126.235-.19h.003z"/>
+                            <path d="M20.721 7.289c-.175-.05-.355-.094-.536-.132a7.386 7.386 0 00-1.216-.159c-.914-.056-1.994-.04-3.263-.04H10.23a.41.41 0 00-.407.348l-.88 5.573-.03.158a.561.561 0 01.554-.48h1.15c2.26 0 4.376-.382 5.646-1.728.5-.53.78-1.2.997-1.886.14-.447.25-.92.323-1.422.005-.033.009-.066.013-.1.08-.454.11-.87.11-1.206a5.52 5.52 0 00-.053-.756v-.001z" opacity=".6"/>
+                          </svg>
+                          Pay with <span className="font-semibold tracking-normal">PayPal</span>
+                        </button>
+                      )}
+                      {!showPaypal && !paypalProcessing && (
+                        <p className="text-[10px] text-neutral-400 text-center mt-2">Express checkout with PayPal</p>
+                      )}
                     </div>
                   )}
                 </div>
