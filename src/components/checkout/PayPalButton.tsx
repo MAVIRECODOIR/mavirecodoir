@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY || ""
 
 type PayPalButtonProps = {
   cartId: string
@@ -114,7 +115,7 @@ export default function PayPalButton({ cartId, onApprove, onError, disabled, sdk
       async createOrder() {
         const res = await fetch(`${BACKEND_URL}/store/paypal/create-order`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-publishable-api-key": PUBLISHABLE_KEY },
           body: JSON.stringify({ cart_id: cartIdRef.current }),
           credentials: "include",
         })
@@ -129,7 +130,7 @@ export default function PayPalButton({ cartId, onApprove, onError, disabled, sdk
         try {
           const res = await fetch(`${BACKEND_URL}/store/paypal/capture-order`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "x-publishable-api-key": PUBLISHABLE_KEY },
             body: JSON.stringify({ cart_id: cartIdRef.current, order_id: data.orderID as string }),
             credentials: "include",
           })
