@@ -90,7 +90,7 @@ function resolveStatus(variant: ProductDetail["variants"][number], product: Prod
 
 export function ProductDetailView({ product, locale, countryCode }: ProductDetailViewProps) {
   const router = useRouter();
-  const { ensureCart, openCart, refetchCart } = useCart();
+  const { ensureCart, openCart, refetchCart, cart } = useCart();
   const userCurrency = (countryCode && REGIONS[countryCode as keyof typeof REGIONS]?.currency) ?? 'GBP'
 
   const uniqueColors = useMemo(() => {
@@ -157,6 +157,11 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
   const selectedVariant =
     product.variants.find((v) => v.id === selectedVariantId) ??
     product.variants[0];
+
+  const selectionValid = !hasMultipleColors || !!selectedColor;
+  const existingItem = cart?.items?.find((i: any) => i.variant_id === selectedVariantId);
+  const existingQty = existingItem?.quantity || 0;
+  const maxedOut = existingQty >= 2;
 
   const comingSoon = product.metadata?.coming_soon === true;
 
@@ -232,6 +237,7 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
   const handleColorSelect = (color: string) => {
     const next = color === selectedColor ? null : color;
     setSelectedColor(next);
+    setAddMessage("");
     if (next) {
       const first = product.variants.find((v) => parseColor(v.title) === next);
       if (first) setSelectedVariantId(first.id);
@@ -244,8 +250,17 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
     }
   };
 
+  const [addMessage, setAddMessage] = useState("");
+
   const handleAddToCart = async () => {
+    if (!selectionValid) return;
+    if (maxedOut) {
+      setAddMessage("Maximum 2 per item");
+      setTimeout(() => setAddMessage(""), 3000);
+      return;
+    }
     setAdding(true);
+    setAddMessage("");
     try {
       const cartId = await ensureCart();
       await addToCart(cartId, selectedVariantId, 1);
@@ -259,7 +274,14 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
   };
 
   const handlePaypalCheckout = async () => {
+    if (!selectionValid) return;
+    if (maxedOut) {
+      setAddMessage("Maximum 2 per item");
+      setTimeout(() => setAddMessage(""), 3000);
+      return;
+    }
     setAdding(true);
+    setAddMessage("");
     try {
       const cartId = await ensureCart();
       await addToCart(cartId, selectedVariantId, 1);
@@ -424,7 +446,7 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
                 <div className="relative">
                   <select
                     value={selectedVariantId}
-                    onChange={(e) => setSelectedVariantId(e.target.value)}
+                    onChange={(e) => { setSelectedVariantId(e.target.value); setAddMessage(""); }}
                     className="w-full border border-neutral-300 px-4 py-3 text-sm bg-white appearance-none cursor-pointer transition-colors focus:border-black outline-none"
                     style={{
                       backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
@@ -486,13 +508,16 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
                   {(productionStatus === "in_stock" || productionStatus === "low_stock" || productionStatus === "pre_order") && (
                     <button
                       type="button"
-                      disabled={adding}
+                      disabled={adding || !selectionValid || maxedOut}
                       onClick={handleAddToCart}
                       className="mt-4 w-full bg-black text-white py-[15px] px-6 text-[11px] tracking-[0.12em] uppercase hover:bg-neutral-900 transition-colors disabled:opacity-50 flex items-center justify-between"
                     >
                       <span>{adding ? "Adding..." : productionStatus === "pre_order" ? "Pre-Order" : "Add to Cart"}</span>
                       {price && <span className="font-medium" data-testid="price-line">{formatPrice(price.amount, displayCurrency)}</span>}
                     </button>
+                  )}
+                  {addMessage && (
+                    <p className="text-xs text-amber-600 mt-2 text-center">{addMessage}</p>
                   )}
 
                   {/* Notify for out of stock / sold out / future run */}
@@ -558,7 +583,7 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
                       ) : (
                         <button
                           type="button"
-                          disabled={adding}
+                          disabled={adding || !selectionValid || maxedOut}
                           onClick={handlePaypalCheckout}
                           className="w-full border border-neutral-300 bg-white text-neutral-700 py-[13px] px-6 text-[11px] tracking-[0.1em] uppercase hover:border-neutral-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                         >
