@@ -1,13 +1,23 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import MegaNav from "./MegaNav";
 import Backdrop from "../ui/Backdrop";
+import LocalizedLink from "../LocalizedLink";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
+import { ALL_COUNTRY_CODES } from "@/config/regions";
+
+function stripLocale(path: string): string {
+  const segs = path.split("/").filter(Boolean)
+  if (segs.length >= 2 && ALL_COUNTRY_CODES.includes(segs[0] as any)) {
+    return "/" + segs.slice(2).join("/")
+  }
+  return path
+}
 
 /* ─── SVG icon components matching MAVIRE CODIR icon paths ─── */
 
@@ -96,7 +106,11 @@ function CloseIcon() {
 
 export default function Header() {
   const pathname = usePathname() ?? "/";
-  const isHomePage = pathname === "/";
+  const params = useParams()
+  const countryCode = (params?.countryCode as string) || ""
+  const locale = (params?.locale as string) || ""
+  const stripPath = stripLocale(pathname)
+  const isHomePage = stripPath === "/";
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -105,7 +119,7 @@ export default function Header() {
       .catch(() => setIsLoggedIn(false));
   }, []);
 
-  if (pathname === "/cart" || pathname === "/checkout") {
+  if (stripPath === "/cart" || stripPath === "/checkout") {
     return null;
   }
 
@@ -434,13 +448,12 @@ export default function Header() {
 
           const buildLinks = (base: string, items: { label: string; handle: string; path?: string }[]) => {
             return [
-              { label: "View all", href: `/${base}` },
+              { label: "View all", href: `/${countryCode}/${locale}/${base}` },
               ...items.map((item) => {
-                // Derive friendly path from handle unless an explicit path is provided
                 const derivedPath = item.handle.startsWith(`${base}-`)
                   ? `/${base}/${item.handle.replace(`${base}-`, "")}`
                   : `/${item.handle}`;
-                return { label: item.label, href: item.path ?? derivedPath };
+                return { label: item.label, href: item.path ?? `/${countryCode}/${locale}${derivedPath}` };
               }),
             ];
           };
@@ -454,16 +467,16 @@ export default function Header() {
           let navLinks: { label: string; href: string }[] = [];
           let navTitle = "";
 
-          if (pathname.startsWith("/men")) {
+          if (stripPath.startsWith("/men")) {
             navLinks = menLinks;
             navTitle = "Men";
-          } else if (pathname.startsWith("/women")) {
+          } else if (stripPath.startsWith("/women")) {
             navLinks = womenLinks;
             navTitle = "Women";
-          } else if (pathname.startsWith("/unisex")) {
+          } else if (stripPath.startsWith("/unisex")) {
             navLinks = unisexLinks;
             navTitle = "Unisex";
-          } else if (pathname.startsWith("/accessories")) {
+          } else if (stripPath.startsWith("/accessories")) {
             navLinks = accessoriesLinks;
             navTitle = "Accessories";
           } else if (pathname.startsWith("/archive")) {
@@ -525,8 +538,9 @@ export default function Header() {
                 >
                   {navLinks.map((item, idx, arr) => {
                     // Check if this link is active (exact match or starts with for subcollections)
+                    const itemStrip = stripLocale(item.href)
                     const isActive = pathname === item.href || 
-                      (item.href !== navLinks[0].href && pathname.startsWith(item.href));
+                      (itemStrip !== stripLocale(navLinks[0].href) && stripPath.startsWith(itemStrip));
                     
                     return (
                       <li

@@ -1,55 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { ALL_COUNTRY_CODES, REGIONS, DEFAULT_COUNTRY, getDefaultLocale } from '@/config/regions'
 
-// Map of country codes your Medusa regions cover
-const SUPPORTED_COUNTRIES = ['gb', 'us', 'ca', 'eu']
-const DEFAULT_COUNTRY = 'gb'
+function detectCountry(request: NextRequest): string {
+  const saved = request.cookies.get('preferred_country')?.value
+  if (saved && (ALL_COUNTRY_CODES as string[]).includes(saved)) return saved
 
-// Guess country from browser's Accept-Language header
-// e.g. "en-GB,en;q=0.9" → "gb"
-function getCountryFromLocale(request: NextRequest): string {
-  const acceptLanguage = request.headers.get('accept-language') || ''
-  const locale = acceptLanguage.split(',')[0].toLowerCase() // "en-gb"
-  
-  if (locale.includes('-gb') || locale === 'en-gb') return 'gb'
-  if (locale.includes('-us') || locale === 'en-us') return 'us'
+  const locale = (request.headers.get('accept-language') || '')
+    .split(',')[0].toLowerCase()
+
+  if (locale.includes('-gb')) return 'gb'
+  if (locale.includes('-us')) return 'us'
   if (locale.includes('-ca')) return 'ca'
-  // EU countries
-  if (locale.includes('-de') || locale.includes('-fr') || locale.includes('-it') || 
-      locale.includes('-es') || locale.includes('-nl') || locale.includes('-be') ||
-      locale.includes('-at') || locale.includes('-dk') || locale.includes('-se') ||
-      locale.includes('-fi') || locale.includes('-no') || locale.includes('-pl') ||
-      locale.includes('-cz') || locale.includes('-hu') || locale.includes('-ro') ||
-      locale.includes('-gr') || locale.includes('-pt') || locale.includes('-ie')) return 'eu'
-  
+  if (/-(de|fr|it|es|nl|be|at|dk|se|fi|no|pl|cz|hu|ro|gr|pt|ie)/.test(locale)) return 'eu'
+
   return DEFAULT_COUNTRY
 }
 
-export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
+function detectLocale(request: NextRequest, countryCode: string): string {
+  const saved = request.cookies.get('preferred_locale')?.value
+  const region = REGIONS[countryCode as keyof typeof REGIONS]
+  if (saved && region && (region.locales as readonly string[]).includes(saved)) {
+    return saved
+  }
+  return getDefaultLocale(countryCode as any)
+}
 
-  // Skip if URL already has a country code prefix
-  const pathnameHasCountry = SUPPORTED_COUNTRIES.some(
-    country => pathname.startsWith(`/${country}/`) || pathname === `/${country}` 
-  )
-  if (pathnameHasCountry) return NextResponse.next()
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-  // Skip for static files, API routes, etc.
-  if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.startsWith('/favicon')) {
+  if (pathname.startsWith('/_next') || pathname.includes('.')) {
     return NextResponse.next()
   }
 
-  // Check if user has a saved country preference cookie
-  const cookieStore = await cookies()
-  const savedCountry = cookieStore.get('preferred_country')?.value
-  const country = (savedCountry && SUPPORTED_COUNTRIES.includes(savedCountry))
-    ? savedCountry
-    : getCountryFromLocale(request)
+  if (pathname.startsWith('/api') || pathname.startsWith('/admin')) {
+    return NextResponse.next()
+  }
 
-  // Redirect to country-prefixed URL
-  return NextResponse.redirect(
-    new URL(`/${country}${pathname}`, request.url)
-  )
+  const segments = pathname.split('/').filter(Boolean)
+
+  const hasCountry = (ALL_COUNTRY_CODES as string[]).includes(segments[0])
+  const region = hasCountry ? REGIONS[segments[0] as keyof typeof REGIONS] : null
+  const hasLocale = hasCountry && region &&
+    (region.locales as readonly string[]).includes(segments[1])
+
+  if (hasCountry && hasLocale) return NextResponse.next()
+
+  if (hasCountry && !hasLocale) {
+    const country = segments[0]
+    const locale = detectLocale(request, country)
+    const rest = segments.slice(1).join('/')
+    const destination = rest ? `/${country}/${locale}/${rest}` : `/${country}/${locale}`
+    return NextResponse.redirect(new URL(destination, request.url))
+  }
+
+  const country = detectCountry(request)
+  const locale = detectLocale(request, country)
+  const rest = segments.join('/')
+  const destination = rest ? `/${country}/${locale}/${rest}` : `/${country}/${locale}`
+  return NextResponse.redirect(new URL(destination, request.url))
 }
 
 export const config = {

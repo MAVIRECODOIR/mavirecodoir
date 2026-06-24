@@ -54,6 +54,7 @@ export default function CartRoute() {
   const router = useRouter();
   const params = useParams();
   const countryCode = params?.countryCode as string || 'gb';
+  const locale = params?.locale as string || 'en_gb';
   const { cartId, isLoading } = useCart();
   const { region } = useRegion();
   const [cart, setCart] = useState<MedusaCart | null>(null);
@@ -84,7 +85,7 @@ export default function CartRoute() {
       console.log("Updating cart region from", cart.region?.currency_code, "to", region.currency_code);
       (async () => {
         try {
-          const sdk = (await import("../../../lib/medusa/client")).default;
+          const sdk = (await import("@/lib/medusa/client")).default;
           const { cart: updatedCart } = await sdk.store.cart.update(cartId, {
             region_id: region.id,
           });
@@ -119,7 +120,7 @@ export default function CartRoute() {
   const handleCheckout = async () => {
     if (!cartId) return;
     try {
-      const sdk = (await import("../../../lib/medusa/client")).default
+      const sdk = (await import("@/lib/medusa/client")).default
       const metadata: Record<string, string> = {}
       if (offerAsGift) metadata.gift_packaging = "true"
       if (giftNote.trim()) metadata.gift_message = giftNote.trim()
@@ -144,7 +145,7 @@ export default function CartRoute() {
       {/* ─── Header ─── */}
       <header className="h-14 md:h-16 bg-black flex items-center justify-center relative px-3">
         <Link
-          href={`/${countryCode}`}
+          href={`/${countryCode}/${locale}`}
           className="absolute left-3 md:left-8 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
           aria-label="Continue Shopping"
         >
@@ -152,7 +153,7 @@ export default function CartRoute() {
             <path d="M19 12H5m0 0l7-7m-7 7l7 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
-        <Link href={`/${countryCode}`} aria-label="MAVIRE CODOIR" className="block w-[140px] md:w-[180px] mx-auto">
+        <Link href={`/${countryCode}/${locale}`} aria-label="MAVIRE CODOIR" className="block w-[140px] md:w-[180px] mx-auto">
           <Image
             src="https://pub-cb269c46bd284333bcafb48988f70133.r2.dev/brand/logos/png/1771394628214-zkowej-Mavire%20Codoir%20-%20LOGO.webp"
             alt="MAVIRE CODOIR"
@@ -198,7 +199,7 @@ export default function CartRoute() {
                     </h6>
                     <p className="text-[13px] text-[#7b8487] mt-1.5">Add items to place an order or log in to retrieve your bag.</p>
                   </div>
-                  <Link href={`/${countryCode}`} className="mt-1 h-11 px-10 bg-black text-white text-[11px] tracking-[0.12em] uppercase flex items-center hover:bg-neutral-900 transition-colors">
+                  <Link href={`/${countryCode}/${locale}`} className="mt-1 h-11 px-10 bg-black text-white text-[11px] tracking-[0.12em] uppercase flex items-center hover:bg-neutral-900 transition-colors">
                     Continue Shopping
                   </Link>
                 </div>

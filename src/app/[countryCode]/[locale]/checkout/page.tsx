@@ -4,15 +4,15 @@ import { Suspense, useState, useEffect, useCallback, useRef } from "react"
 import { useSearchParams, useRouter, useParams } from "next/navigation"
 import { loadStripe } from "@stripe/stripe-js"
 import Image from "next/image"
-import CheckoutShell from "../../../components/checkout/CheckoutShell"
-import PayPalButton from "../../../components/checkout/PayPalButton"
-import Checkbox from "../../../components/checkout/Checkbox"
-import GoogleAddressAutocomplete from "../../../components/checkout/GoogleAddressAutocomplete"
-import PhoneInputWithCountry from "../../../components/checkout/PhoneInputWithCountry"
-import StripePayment from "../../../components/checkout/StripePayment"
-import { CheckoutSkeleton, ShippingOptionsSkeleton, PaymentSkeleton } from "../../../components/checkout/Skeleton"
-import { getCart } from "../../../lib/medusa/cart"
-import { getShippingOptions, setShippingMethod, initiatePayPalSession, initiateStripeSession, completeCart, updateCartRegionIfNeeded } from "../../../lib/medusa/checkout"
+import CheckoutShell from "@/components/checkout/CheckoutShell"
+import PayPalButton from "@/components/checkout/PayPalButton"
+import Checkbox from "@/components/checkout/Checkbox"
+import GoogleAddressAutocomplete from "@/components/checkout/GoogleAddressAutocomplete"
+import PhoneInputWithCountry from "@/components/checkout/PhoneInputWithCountry"
+import StripePayment from "@/components/checkout/StripePayment"
+import { CheckoutSkeleton, ShippingOptionsSkeleton, PaymentSkeleton } from "@/components/checkout/Skeleton"
+import { getCart } from "@/lib/medusa/cart"
+import { getShippingOptions, setShippingMethod, initiatePayPalSession, initiateStripeSession, completeCart, updateCartRegionIfNeeded } from "@/lib/medusa/checkout"
 import { isValidPhoneNumber } from "libphonenumber-js"
 import { formatPrice, formatPriceFree } from "@/lib/utils/format"
 import { useCart } from "@/lib/medusa/cart-context"
@@ -212,7 +212,7 @@ function CheckoutContent() {
       console.log("Checkout: Updating cart region from", cart.region?.currency_code, "to", region.currency_code);
       (async () => {
         try {
-          const sdk = (await import("../../../lib/medusa/client")).default;
+          const sdk = (await import("@/lib/medusa/client")).default;
           const { cart: updatedCart } = await sdk.store.cart.update(cartId, {
             region_id: region.id,
           });
@@ -507,7 +507,7 @@ function CheckoutContent() {
     setAddressSaved(true)
     setOpenSection("shipping-method")
     try {
-      const sdk = (await import("../../../lib/medusa/client")).default
+      const sdk = (await import("@/lib/medusa/client")).default
       await sdk.store.cart.update(cartId, {
         email: address.email,
         shipping_address: {
@@ -610,7 +610,7 @@ function CheckoutContent() {
     if (!cartId) return
     setPaymentError(null)
     try {
-      const sdk = (await import("../../../lib/medusa/client")).default
+      const sdk = (await import("@/lib/medusa/client")).default
       const update: Record<string, any> = {
         ...(!useShippingForBilling ? {
           billing_address: {

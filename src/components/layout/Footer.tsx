@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import LocaleSelector from "./LocaleSelector";
+import LocalizedLink from "../LocalizedLink";
 
 const FOOTER_COLUMNS = [
   {
@@ -125,12 +126,12 @@ export default function Footer() {
               <ul className="space-y-3 text-center">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link
+                    <LocalizedLink
                       href={link.href}
                       className="text-[13px] font-medium tracking-[0.03em] text-white/70 hover:text-white transition-colors"
                     >
                       {link.label}
-                    </Link>
+                    </LocalizedLink>
                   </li>
                 ))}
               </ul>
@@ -144,7 +145,7 @@ export default function Footer() {
         <div className="luxury-container py-8 flex flex-col md:flex-row items-center gap-4 relative">
           {/* Logo - positioned absolutely on left */}
           <div className="absolute left-8 top-[55%] -translate-y-1/2 flex items-center">
-            <Link href="/" aria-label="MAVIRE CODOIR - go to homepage">
+            <LocalizedLink href="/" aria-label="MAVIRE CODOIR - go to homepage">
               <Image
                 src="https://pub-cb269c46bd284333bcafb48988f70133.r2.dev/brand/logos/png/1771394628214-zkowej-Mavire%20Codoir%20-%20LOGO.webp"
                 alt="MAVIRE CODOIR"
@@ -154,7 +155,7 @@ export default function Footer() {
                 className="w-[200px] max-w-[60vw] object-contain"
                 style={{ filter: "brightness(0) invert(1)" }}
               />
-            </Link>
+            </LocalizedLink>
           </div>
 
           {/* Center content - copyright */}

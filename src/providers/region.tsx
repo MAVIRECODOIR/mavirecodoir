@@ -187,13 +187,19 @@ export const RegionProvider = ({ children, countryCode, regions }: RegionProvide
   )
 
   const setRegionById = (regionId: string) => {
-    // Navigate to the country code for this region
     const selectedRegion = regions.find(r => r.id === regionId)
     if (selectedRegion && selectedRegion.countries?.[0]) {
       const newCountryCode = selectedRegion.countries[0].iso_2.toLowerCase()
       const currentPath = window.location.pathname
-      const newPath = currentPath.replace(/^\/[a-z]{2}(\/|$)/, `/${newCountryCode}$1`)
-      window.location.href = newPath
+      const segments = currentPath.split("/").filter(Boolean)
+      if (segments.length >= 2 && segments[0] === countryCode) {
+        const locale = segments[1]
+        const rest = segments.slice(2).join("/")
+        window.location.href = `/${newCountryCode}/${locale}${rest ? "/" + rest : ""}`
+      } else {
+        const newPath = currentPath.replace(/^\/[a-z]{2}(\/|$)/, `/${newCountryCode}$1`)
+        window.location.href = newPath
+      }
     }
   }
 

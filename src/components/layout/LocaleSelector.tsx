@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import { LOCALES, readLocalePrefs, saveLocalePrefs } from "@/lib/locale";
 import type { LocalePreferences } from "@/lib/locale";
 
@@ -10,6 +11,8 @@ export default function LocaleSelector() {
   const [prefs, setPrefs] = useState<LocalePreferences | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const params = useParams()
+  const countryCode = params?.countryCode as string
 
   useEffect(() => {
     // Load from cookies first
@@ -58,8 +61,15 @@ export default function LocaleSelector() {
     saveLocalePrefs(newPrefs);
     setPrefs(newPrefs);
     setIsOpen(false);
-    // Reload to apply any locale-dependent changes
-    window.location.reload();
+    const localeCode = code.replace("-", "_").toLowerCase()
+    const currentPath = window.location.pathname
+    const segments = currentPath.split("/").filter(Boolean)
+    if (segments.length >= 2) {
+      segments[1] = localeCode
+      window.location.href = "/" + segments.join("/")
+    } else {
+      window.location.reload()
+    }
   };
 
   // Group locales by country for the dropdown

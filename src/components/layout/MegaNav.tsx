@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Backdrop from "../ui/Backdrop";
+import LocalizedLink from "../LocalizedLink";
 
 /* ─── Chevron arrow icon ─── */
 function ChevronIcon({ className, size = 16 }: { className?: string; size?: number }) {
@@ -356,7 +357,7 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
                     />
                   </button>
                 ) : (
-                  <Link
+                  <LocalizedLink
                     href={item.href}
                     onClick={onClose}
                     style={{
@@ -384,7 +385,7 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
                         </span>
                       )}
                     </span>
-                  </Link>
+                  </LocalizedLink>
                 )}
 
                 {/* L2 submenu */}
@@ -400,7 +401,7 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
                     <ul style={{ margin: 0, padding: l2ListPad, listStyle: "none" }}>
                       {item.children.map((child, ci) => (
                         <li key={child.label}>
-                          <Link
+                          <LocalizedLink
                             href={child.href}
                             onClick={onClose}
                             style={{
@@ -416,7 +417,7 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
                             }}
                           >
                             <span style={{ paddingBottom: 4 }}>{child.label}</span>
-                          </Link>
+                          </LocalizedLink>
                         </li>
                       ))}
                     </ul>
@@ -432,7 +433,7 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
           {/* ─── Bottom links ─── */}
           <div style={{ padding: "12px 0", display: "flex", flexDirection: "column" }}>
             {BOTTOM_LINKS.map((link, i) => (
-              <Link
+              <LocalizedLink
                 key={link.label}
                 href={link.href}
                 onClick={(e) => {
@@ -482,7 +483,7 @@ export default function MegaNav({ isOpen, onClose, onOpenSearch, onOpenWishlist 
                   </svg>
                 )}
                 <span style={{ paddingBottom: 4 }}>{link.label}</span>
-              </Link>
+              </LocalizedLink>
             ))}
 
             {/* ─── Sign Out (logged in only) ─── */}

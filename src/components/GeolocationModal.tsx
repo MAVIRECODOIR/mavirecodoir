@@ -64,7 +64,8 @@ export default function GeolocationModal() {
     if (detectedCountry) {
       localStorage.setItem('preferred_country', detectedCountry)
       localStorage.setItem('geolocation_dismissed', 'true')
-      router.push(`/${detectedCountry}`)
+      const locale = (params?.locale as string) || 'en_gb'
+      router.push(`/${detectedCountry}/${locale}`)
     }
   }
 

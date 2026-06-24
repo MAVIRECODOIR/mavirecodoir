@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/utils/format";
 
 type ProductDetailViewProps = {
   product: ProductDetail;
+  locale?: string;
 };
 
 type TabKey = "description" | "size" | "contact" | "delivery";
@@ -84,7 +85,7 @@ function resolveStatus(variant: ProductDetail["variants"][number], product: Prod
   return metaStatus ?? "in_stock";
 }
 
-export function ProductDetailView({ product }: ProductDetailViewProps) {
+export function ProductDetailView({ product, locale }: ProductDetailViewProps) {
   const router = useRouter();
   const { ensureCart } = useCart();
   const [userCurrency, setUserCurrency] = useState("GBP");
