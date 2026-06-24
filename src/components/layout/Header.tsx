@@ -182,6 +182,38 @@ export default function Header() {
     ).catch(() => {})
   }, [cartId]);
 
+  const [childrenByParent, setChildrenByParent] = useState<Record<string, { label: string; handle: string }[]>>({});
+  const [navReady, setNavReady] = useState(false);
+
+  useEffect(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000";
+    const apiKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY || "";
+    const url = new URL("/store/collections", baseUrl);
+    url.searchParams.set("fields", "id,title,handle,parent_collection_id");
+    url.searchParams.set("limit", "100");
+
+    fetch(url.toString(), {
+      headers: { "x-publishable-api-key": apiKey, "Content-Type": "application/json" },
+    })
+      .then((r) => r.json())
+      .then((data: any) => {
+        const all = data.collections || [];
+        const grouped: Record<string, { label: string; handle: string }[]> = {};
+        const parentHandles = ["men", "women", "unisex", "accessories", "archive"];
+        for (const parentHandle of parentHandles) {
+          const parent = all.find((c: any) => c.handle === parentHandle);
+          if (parent) {
+            grouped[parentHandle] = all
+              .filter((c: any) => c.parent_collection_id === parent.id)
+              .map((c: any) => ({ label: c.title, handle: c.handle }));
+          }
+        }
+        setChildrenByParent(grouped);
+        setNavReady(true);
+      })
+      .catch(() => setNavReady(true));
+  }, []);
+
   /* ─── Scroll-driven state (binary trigger, CSS transitions handle smoothness) ─── */
   // On inner pages, always show compact header (no animation)
   const collapsed = isHomePage ? scrollY > 2 : true;
@@ -414,41 +446,6 @@ export default function Header() {
 
         {/* Dior-style Subcategory Navigation — sticky under header on collection routes */}
         {(() => {
-          // Define subcategory links directly from collection handles (matches created collections)
-          const MEN_COLLECTIONS = [
-            { label: "Outerwear", handle: "men-outerwear" },
-            { label: "Jackets", handle: "men-jackets" },
-            { label: "Shirts", handle: "men-shirts" },
-            { label: "T-Shirts", handle: "men-t-shirts" },
-            { label: "Denim", handle: "men-denim" },
-            { label: "Knitwear", handle: "men-knitwear" },
-            { label: "Trousers", handle: "men-trousers" },
-          ];
-
-          const WOMEN_COLLECTIONS = [
-            { label: "Outerwear", handle: "women-outerwear" },
-            { label: "Dresses", handle: "women-dresses" },
-            { label: "Tops", handle: "women-tops" },
-            { label: "Knitwear", handle: "women-knitwear" },
-            { label: "Trousers", handle: "women-trousers" },
-            { label: "Skirts", handle: "women-skirts" },
-            { label: "Denim", handle: "women-denim" },
-          ];
-
-          const UNISEX_COLLECTIONS = [
-            { label: "Outerwear", handle: "unisex-outerwear" },
-            { label: "Knitwear", handle: "unisex-knitwear" },
-          ];
-
-          const ACCESSORIES_COLLECTIONS = [
-            { label: "Bags", handle: "accessories/bags", path: "/accessories/bags" },
-            { label: "Scarves", handle: "accessories/scarves", path: "/accessories/scarves" },
-            { label: "Hats", handle: "accessories/hats", path: "/accessories/hats" },
-            { label: "Belts", handle: "accessories/belts", path: "/accessories/belts" },
-          ];
-
-          const ARCHIVE_COLLECTIONS: { label: string; handle: string; path?: string }[] = [];
-
           const buildLinks = (base: string, items: { label: string; handle: string; path?: string }[]) => {
             return [
               { label: "View all", href: `/${countryCode}/${locale}/${base}` },
@@ -461,11 +458,13 @@ export default function Header() {
             ];
           };
 
-          const menLinks = buildLinks("men", MEN_COLLECTIONS);
-          const womenLinks = buildLinks("women", WOMEN_COLLECTIONS);
-          const unisexLinks = buildLinks("unisex", UNISEX_COLLECTIONS);
-          const accessoriesLinks = buildLinks("accessories", ACCESSORIES_COLLECTIONS);
-          const archiveLinks = buildLinks("archive", ARCHIVE_COLLECTIONS);
+          if (!navReady) return null;
+
+          const menLinks = buildLinks("men", childrenByParent["men"] || []);
+          const womenLinks = buildLinks("women", childrenByParent["women"] || []);
+          const unisexLinks = buildLinks("unisex", childrenByParent["unisex"] || []);
+          const accessoriesLinks = buildLinks("accessories", childrenByParent["accessories"] || []);
+          const archiveLinks = buildLinks("archive", childrenByParent["archive"] || []);
 
           let navLinks: { label: string; href: string }[] = [];
           let navTitle = "";

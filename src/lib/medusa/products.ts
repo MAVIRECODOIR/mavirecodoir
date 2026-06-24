@@ -175,7 +175,7 @@ export async function getFeaturedProducts() {
 export async function getCollections() {
   try {
     const data = await medusaFetch<{ collections: any[] }>("/store/collections", {
-      fields: "id,title,handle,metadata",
+      fields: "id,title,handle,metadata,parent_collection_id",
       limit: "100",
     });
     return data.collections;
@@ -185,10 +185,22 @@ export async function getCollections() {
   }
 }
 
+export async function getChildCollections(parentHandle: string) {
+  try {
+    const all = await getCollections();
+    const parent = all.find((c: any) => c.handle === parentHandle);
+    if (!parent) return [];
+    return all.filter((c: any) => c.parent_collection_id === parent.id);
+  } catch (error) {
+    console.error("Error fetching child collections from Medusa:", error);
+    return [];
+  }
+}
+
 export async function getCollectionByHandle(handle: string) {
   try {
     const data = await medusaFetch<{ collections: any[] }>("/store/collections", {
-      fields: "id,title,handle,metadata",
+      fields: "id,title,handle,metadata,parent_collection_id",
       handle: decodeURIComponent(handle),
     });
     return data.collections[0] || null;
