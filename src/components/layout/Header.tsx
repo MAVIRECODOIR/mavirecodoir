@@ -310,21 +310,6 @@ export default function Header() {
     <ul className="flex items-center gap-0 md:gap-0.5">
       <li className="hidden md:flex">
         <button
-          onClick={openCart}
-          aria-label="my shopping bag"
-          aria-haspopup="dialog"
-          className="mavire-btn-motion flex items-center justify-center w-10 h-10 relative"
-        >
-          <BagIcon color={iconColor} />
-          {cartItemCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] rounded-full bg-black text-white text-[9px] font-semibold flex items-center justify-center leading-none">
-              {cartItemCount}
-            </span>
-          )}
-        </button>
-      </li>
-      <li className="hidden md:flex">
-        <button
           onClick={() => wishlist.open()}
           aria-label="my wishlist"
           aria-haspopup="dialog"
@@ -356,6 +341,21 @@ export default function Header() {
         </button>
       </li>
       <li className="hidden md:flex">
+        <button
+          onClick={openCart}
+          aria-label="my shopping bag"
+          aria-haspopup="dialog"
+          className="mavire-btn-motion flex items-center justify-center w-10 h-10 relative"
+        >
+          <BagIcon color={iconColor} />
+          {cartItemCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] rounded-full bg-black text-white text-[9px] font-semibold flex items-center justify-center leading-none">
+              {cartItemCount}
+            </span>
+          )}
+        </button>
+      </li>
+      <li className="hidden md:flex">
         <Link
           href={isLoggedIn ? "/client/my-account" : "/client/sign-up"}
           aria-label="my account"
@@ -374,9 +374,9 @@ export default function Header() {
           <SearchIcon color={iconColor} />
         </button>
       </li>
-      {/* Mobile: icons (hidden on homepage hero, always visible on inner pages) */}
+      {/* Mobile: search (left side on inner pages) */}
       <li
-        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
+        className={`${isHomePage ? (collapsed ? "hidden" : "flex") : "hidden"} md:hidden`}
       >
         <button
           onClick={openSearch}
@@ -384,6 +384,17 @@ export default function Header() {
           className="mavire-btn-motion flex items-center justify-center w-9 h-9"
         >
           <SearchIcon color={iconColor} />
+        </button>
+      </li>
+      <li
+        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
+      >
+        <button
+          onClick={() => wishlist.open()}
+          aria-label="my wishlist"
+          className="mavire-btn-motion flex items-center justify-center w-9 h-9 relative"
+        >
+          <HeartIcon color={iconColor} filled={wishlist.count > 0} />
         </button>
       </li>
       <li
@@ -401,17 +412,6 @@ export default function Header() {
               {cartItemCount}
             </span>
           )}
-        </button>
-      </li>
-      <li
-        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
-      >
-        <button
-          onClick={() => wishlist.open()}
-          aria-label="my wishlist"
-          className="mavire-btn-motion flex items-center justify-center w-9 h-9 relative"
-        >
-          <HeartIcon color={iconColor} filled={wishlist.count > 0} />
         </button>
       </li>
       <li
@@ -487,11 +487,8 @@ export default function Header() {
             className="relative flex items-center justify-between h-full"
             style={{ padding: "0 20px" }}
           >
-            {/* Left: mobile menu + desktop Contact Us */}
-            <div
-              className="flex items-center h-full"
-              style={{ width: headerSideWidth }}
-            >
+            {/* Left: mobile menu + search + desktop Contact Us */}
+            <div className="flex items-center h-full">
               <button
                 onClick={() => setIsNavOpen((prev) => !prev)}
                 aria-label="menu toggle"
@@ -501,16 +498,23 @@ export default function Header() {
               >
                 <AnimatedMenuIcon color="#000" isOpen={isNavOpen} size={20} />
               </button>
+              <button
+                onClick={openSearch}
+                aria-label="search"
+                className="mavire-btn-motion flex md:hidden items-center justify-center w-9 h-9"
+              >
+                <SearchIcon color="#000" />
+              </button>
               <div className="hidden md:flex items-center h-full">
                 {contactBtn}
               </div>
             </div>
 
-            {/* Center: compact logo */}
+            {/* Center: compact logo — absolute centered */}
             <Link
               href="/"
               aria-label="MAVIRE CODOIR - go to homepage"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:left-1/2 md:-translate-x-1/2 max-md:!left-4 max-md:!translate-x-0 max-md:!w-[140px]"
+              className="absolute left-1/2 top-1/2 -translate-x-[38%] -translate-y-1/2"
               style={{ width: collapsedLogoWidth }}
             >
               <Image
@@ -520,7 +524,7 @@ export default function Header() {
                 height={213}
                 priority
                 unoptimized
-                className="transition-[filter] duration-300"
+                className="transition-[filter] duration-300 max-md:!w-[140px]"
                 style={{
                   filter: `brightness(0) invert(${logoInvert})`,
                   objectFit: "contain",
@@ -529,11 +533,7 @@ export default function Header() {
             </Link>
 
             {/* Right: icons */}
-            <div
-              className="flex items-center justify-end"
-              style={{ width: headerSideWidth }}
-              data-right-icons
-            >
+            <div className="flex items-center justify-end gap-1 -mr-3" data-right-icons>
               {iconList}
             </div>
           </div>

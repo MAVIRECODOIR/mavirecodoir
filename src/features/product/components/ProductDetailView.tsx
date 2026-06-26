@@ -103,9 +103,9 @@ function CuratedEditsSection({ countryCode, tags, currentProductId, curatedTagVa
   if (loading || products.length === 0) return null;
 
   return (
-    <section className="px-6 md:px-[30px] pb-5">
+    <section className="px-6 md:px-[30px] pt-12 md:pt-16 pb-5">
       <header className="mb-6">
-        <h2 className="text-xs tracking-wider uppercase font-light m-0">Curated Edits</h2>
+        <h2 className="text-lg tracking-wider font-display m-0">Curated Edits</h2>
       </header>
       <ul className="list-none p-0 m-0 text-[0px]">
         {products.map((product: any) => {
@@ -167,15 +167,24 @@ type TabKey = "description" | "size" | "contact" | "delivery";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "description", label: "Description" },
   { key: "size", label: "Size & Fit" },
-  { key: "contact", label: "Contact & In-store Availability" },
+  { key: "contact", label: "Contact Us" },
   { key: "delivery", label: "Delivery & Returns" },
 ];
 
+const DELIVERY_INFO: Record<string, { standard: string; express: string }> = {
+  gb: { standard: "Complimentary Standard Delivery", express: "£8" },
+  us: { standard: "$25", express: "$40" },
+  ca: { standard: "$25", express: "$40" },
+  eu: { standard: "€15", express: "€25" },
+};
+
+const DEFAULT_SIZE_FIT = "Model is 6'2\" and wears size M. Regular fit. True to size — take your normal size.";
+
 const TAB_CONTENT: Record<TabKey, string> = {
   description: "",
-  size: "Model is 6'2\" and wears size M. Regular fit. True to size — take your normal size.",
+  size: DEFAULT_SIZE_FIT,
   contact: "Contact our Client Advisors at +1 212 555 0123 or email concierge@mavire.co for in-store availability and personal shopping assistance.",
-  delivery: "Free standard delivery on all orders. Express delivery available for £12. Returns accepted within 30 days of receipt in original condition.",
+  delivery: "",
 };
 
 function getStorePrice(variant: ProductDetail["variants"][number] | undefined, currency: string) {
@@ -372,10 +381,17 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
   }, [selectedColor, colorImages, product.images, product.featuredImageUrl]);
 
   const activeTabKey = TABS[activeTab]?.key ?? "description";
+  const delivery = countryCode && DELIVERY_INFO[countryCode] ? DELIVERY_INFO[countryCode] : DELIVERY_INFO.gb;
   const tabContent =
     activeTabKey === "description"
       ? product.description
-      : TAB_CONTENT[activeTabKey];
+      : activeTabKey === "delivery"
+        ? countryCode === "gb"
+          ? `${delivery.standard} for UK customers. Express delivery available for ${delivery.express}. Returns accepted within 30 days of receipt in original condition.`
+          : `International Standard Delivery available for ${delivery.standard}. International Express Delivery available for ${delivery.express}. Returns accepted within 30 days of receipt in original condition.`
+        : activeTabKey === "size"
+          ? (product.metadata?.size_fit as string) || DEFAULT_SIZE_FIT
+          : TAB_CONTENT[activeTabKey];
 
   const handleColorSelect = (color: string) => {
     const next = color === selectedColor ? null : color;
@@ -456,13 +472,14 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
                   </span>
                 </div>
               )}
-              <ul className="flex flex-wrap" style={{ margin: -1 }}>
+              {/* Mobile: horizontal swipe; Desktop: grid */}
+              <ul className="flex flex-nowrap lg:flex-wrap overflow-x-auto lg:overflow-visible snap-x snap-mandatory" style={{ margin: -1, WebkitOverflowScrolling: "touch", scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 {displayImages.map((img, i) => {
                   const isHalfWidth = i >= 3;
                   return (
                     <li
                       key={img.id}
-                      className={isHalfWidth ? "w-1/2" : "w-full"}
+                      className={`flex-shrink-0 w-full snap-start lg:flex-shrink lg:w-auto ${isHalfWidth ? "lg:w-1/2" : "lg:w-full"}`}
                       style={{ padding: 1 }}
                     >
                       <div className="bg-gray-50 overflow-hidden" role="button" tabIndex={0}>
@@ -478,6 +495,12 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
                   );
                 })}
               </ul>
+              {/* Mobile pagination dots */}
+              <div className="flex lg:hidden justify-center gap-1.5 mt-3">
+                {displayImages.map((_, i) => (
+                  <span key={i} className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -488,7 +511,7 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
             <div className="px-6 lg:px-14 py-8 lg:py-12">
               {/* Title + Wishlist */}
               <div className="flex justify-between items-start">
-                <h1 className="text-[22px] lg:text-[26px] leading-tight" style={{ fontWeight: 275 }}>
+                <h1 className="text-[22px] lg:text-[26px] leading-tight font-display" style={{ fontWeight: 275 }}>
                   {product.title}
                 </h1>
                 <button
