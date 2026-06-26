@@ -574,6 +574,12 @@ export default function CartRoute() {
                     <span className="text-[#7b8487]">Tax</span>
                     <span>{taxTotal > 0 ? formatPrice(taxTotal, currency) : "Calculated at checkout"}</span>
                   </div>
+                  {packagingOption && (
+                    <div className="flex justify-between">
+                      <span className="text-[#7b8487]">Packaging</span>
+                      <span className="capitalize">{packagingOption === "signature" ? "Signature Packaging" : "Eco Packaging"}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-[15px] md:text-[16px] font-medium border-t border-[#e5e5e5] pt-3 mt-3">
                     <span>Total</span>
                     <span>{formatPrice(total, currency)}</span>

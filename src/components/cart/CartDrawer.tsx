@@ -285,6 +285,12 @@ export default function CartDrawer() {
               <span style={{ fontWeight: 400, fontSize: 14 }}>Subtotal</span>
               <span style={{ fontWeight: 600, fontSize: 14 }}>{formatPrice(subtotal, currency)}</span>
             </div>
+            {(cart?.metadata?.packaging_type) && (
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16, fontSize: 13, color: "rgb(123, 132, 135)" }}>
+                <span>Packaging</span>
+                <span className="capitalize">{cart.metadata.packaging_type === "signature" ? "Signature Packaging" : "Eco Packaging"}</span>
+              </div>
+            )}
 
             <Link
               href="/cart"

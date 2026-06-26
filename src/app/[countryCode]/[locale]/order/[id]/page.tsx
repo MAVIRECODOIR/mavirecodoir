@@ -66,6 +66,7 @@ interface OrderDisplay {
   shipping_methods?: ShippingMethod[]
   fulfillments?: Fulfillment[]
   payments?: Payment[]
+  metadata?: Record<string, any>
 }
 
 function formatPrice(amount: number, currency?: string) {
@@ -556,6 +557,24 @@ function OrderContent() {
                     {sm.name}{sm.amount > 0 ? ` — ${formatPrice(sm.amount, order.currency_code)}` : ""}
                   </p>
                 ))}
+              </section>
+            )}
+
+            {/* Packaging & Gifting */}
+            {(order.metadata?.packaging_type || order.metadata?.gift_packaging === "true") && (
+              <section>
+                <h2 className="text-[13px] font-medium m-0 mb-2 text-[#33383C] tracking-[0.5px] uppercase">Packaging &amp; Gifting</h2>
+                <div className="text-[13px] md:text-[14px] text-[#33383C] space-y-1">
+                  {order.metadata?.packaging_type && (
+                    <p className="m-0 capitalize">{order.metadata.packaging_type === "signature" ? "Signature Packaging" : "Eco Packaging"}</p>
+                  )}
+                  {order.metadata?.gift_packaging === "true" && (
+                    <p className="m-0 text-[#7B8487]">Offered as a gift{order.metadata?.gift_message ? " with message" : ""}</p>
+                  )}
+                  {order.metadata?.gift_message && (
+                    <p className="m-0 text-[12px] italic text-[#7B8487] mt-1">"{order.metadata.gift_message}"</p>
+                  )}
+                </div>
               </section>
             )}
 
