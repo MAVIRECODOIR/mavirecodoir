@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
 import { addToCart } from "@/lib/medusa/cart";
@@ -12,6 +13,148 @@ import type { ProductDetail, ProductImage } from "../types/product.types";
 import type { WishlistItem } from "@/lib/wishlist";
 import { REGIONS } from "@/config/regions";
 import { formatPrice } from "@/lib/utils/format";
+
+const CURATED_EDIT_TAG = "our-curated-edits";
+
+function CuratedEditsSection({ countryCode, tags, currentProductId, curatedTagValue = CURATED_EDIT_TAG }: { countryCode?: string; tags?: { id: string; value: string }[]; currentProductId?: string; curatedTagValue?: string }) {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const userCurrency = (countryCode && REGIONS[countryCode as keyof typeof REGIONS]?.currency) ?? 'GBP';
+
+  useEffect(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000";
+    const apiKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY || "";
+    const headers = { "x-publishable-api-key": apiKey, "Content-Type": "application/json" };
+    const productFields = "id,title,handle,thumbnail,*variants,*variants.prices,*images";
+
+    async function fetchProducts(url: string): Promise<any[]> {
+      const res = await fetch(url, { headers });
+      const data = await res.json();
+      return data.products || [];
+    }
+
+    (async () => {
+      try {
+        const genreTags = tags?.filter((t) => t.value !== curatedTagValue) || [];
+        const genreTagIds = genreTags.map((t) => t.id);
+        let results: any[] = [];
+
+        // 1. Fetch by shared genre tags (excludes curated tag so trainers don't pull tees)
+        if (genreTagIds.length > 0) {
+          const params = new URLSearchParams();
+          params.set("fields", productFields);
+          params.set("limit", "20");
+          genreTagIds.forEach((id) => params.append("tag_id[]", id));
+          results = await fetchProducts(`${baseUrl}/store/products?${params.toString()}`);
+          results = results.filter((p: any) => p.id !== currentProductId);
+        }
+
+        // 2. Fill from same collection if < 4 results
+        if (results.length < 4) {
+          const prodRes = await fetchProducts(`${baseUrl}/store/products?id[]=${currentProductId}&fields=id,collection_id`);
+          const collectionId = prodRes[0]?.collection_id;
+          if (collectionId) {
+            const params = new URLSearchParams();
+            params.set("fields", productFields);
+            params.set("limit", "20");
+            params.append("collection_id[]", collectionId);
+            const collProducts = await fetchProducts(`${baseUrl}/store/products?${params.toString()}`);
+            const existingIds = new Set(results.map((p: any) => p.id));
+            for (const p of collProducts) {
+              if (p.id !== currentProductId && !existingIds.has(p.id)) {
+                results.push(p);
+                if (results.length >= 8) break;
+              }
+            }
+          }
+        }
+
+        // 3. Fallback to curated tag group if still < 4 — filter by shared tags so trainers only shows trainers
+        if (results.length < 4) {
+          const curatedTag = tags?.find((t) => t.value === curatedTagValue);
+          if (curatedTag) {
+            const params = new URLSearchParams();
+            params.set("fields", `${productFields},*tags`);
+            params.set("limit", "20");
+            params.append("tag_id[]", curatedTag.id);
+            const curatedProducts = await fetchProducts(`${baseUrl}/store/products?${params.toString()}`);
+            const existingIds = new Set(results.map((p: any) => p.id));
+            for (const p of curatedProducts) {
+              if (p.id !== currentProductId && !existingIds.has(p.id)) {
+                const productTagIds = p.tags?.filter((t: any) => t.value !== curatedTagValue).map((t: any) => t.id) || [];
+                const sharesTag = productTagIds.some((tid: string) => genreTagIds.includes(tid));
+                if (!sharesTag) continue;
+                results.push(p);
+                if (results.length >= 8) break;
+              }
+            }
+          }
+        }
+
+        setProducts(results.slice(0, 8));
+      } catch {
+        // silently fail
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [tags, currentProductId, curatedTagValue]);
+
+  if (loading || products.length === 0) return null;
+
+  return (
+    <section className="px-6 md:px-[30px] pb-5">
+      <header className="mb-6">
+        <h2 className="text-xs tracking-wider uppercase font-light m-0">Curated Edits</h2>
+      </header>
+      <ul className="list-none p-0 m-0 text-[0px]">
+        {products.map((product: any) => {
+          const price = product.variants?.[0]?.prices?.find(
+            (p: any) => p.currency_code?.toLowerCase() === userCurrency.toLowerCase()
+          )?.amount ?? product.variants?.[0]?.prices?.[0]?.amount ?? 0;
+          const sizes = product.variants?.map((v: any) => v.title).filter(Boolean) || [];
+          const images = product.images || [];
+          const primaryImage = product.thumbnail || images[0]?.url;
+          const hoverImage = images[1]?.url;
+
+          return (
+            <li key={product.id} className="group relative inline-flex flex-col w-1/2 md:w-1/4 pr-3 md:pr-[30px] mb-[70px] align-top p-0 m-0">
+              <Link href={`/pr/${product.handle}`} className="block no-underline text-[#151515]">
+                <div className="relative w-full overflow-hidden bg-[#eee]">
+                  <div className="pb-[125%] relative">
+                    {primaryImage && (
+                      <img
+                        src={primaryImage}
+                        alt={product.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                      />
+                    )}
+                    {hoverImage && (
+                      <img
+                        src={hoverImage}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-[0.4s]"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="grid grid-cols-[1fr_auto] gap-x-[15px] pt-5">
+                  <span className="text-xs font-light col-start-1 row-start-1">{product.title}</span>
+                  <span className="text-xs font-light text-right">{formatPrice(price, userCurrency)}</span>
+                  {sizes.length > 0 && (
+                    <span className="text-xs font-light opacity-0 group-hover:opacity-100 transition-opacity duration-[0.4s] col-start-1 row-start-1 mt-[18px]">
+                      {sizes.join(' ')}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
 
 type ProductDetailViewProps = {
   product: ProductDetail;
@@ -633,6 +776,7 @@ export function ProductDetailView({ product, locale, countryCode }: ProductDetai
           </div>
         </div>
       </div>
+      <CuratedEditsSection countryCode={countryCode} tags={product.tags} currentProductId={product.id} />
     </main>
   );
 }

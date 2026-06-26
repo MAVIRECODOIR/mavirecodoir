@@ -3,46 +3,83 @@
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
-function RevealBlock({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function RevealBlock({
+  children,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.15 });
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
   return (
-    <div ref={ref} className={`transition-all duration-1000 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: `${delay}ms` }}>
+    <div
+      ref={ref}
+      className={`transition-all duration-1000 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
       {children}
     </div>
   );
 }
 
-const OPENINGS = [
-  { title: "Senior Leather Artisan", location: "London Atelier", type: "Full-time", dept: "Craft" },
-  { title: "Visual Merchandiser", location: "Accra Boutique", type: "Full-time", dept: "Retail" },
-  { title: "Digital Experience Designer", location: "London / Remote", type: "Full-time", dept: "Digital" },
-  { title: "Client Advisor", location: "Tokyo Boutique", type: "Full-time", dept: "Retail" },
-  { title: "Textile Development Lead", location: "London Atelier", type: "Full-time", dept: "Craft" },
-  { title: "Supply Chain Coordinator", location: "London HQ", type: "Full-time", dept: "Operations" },
-];
-
 const VALUES = [
-  { title: "Mastery Over Speed", desc: "We value depth of skill over breadth of output. Every role is an invitation to become exceptional at something meaningful." },
-  { title: "Cultural Fluency", desc: "Our team spans continents and traditions. We seek people who move between cultures with curiosity and respect." },
-  { title: "Quiet Ambition", desc: "We build for permanence, not hype. The work speaks — and so should the people behind it." },
+  {
+    title: "Intention Over Excess",
+    body: "We believe meaningful work begins with purpose. Every decision, whether creative or operational, should contribute to something lasting.",
+  },
+  {
+    title: "Craft & Curiosity",
+    body: "We admire people who care deeply about their work and remain committed to learning. Mastery is not a destination. It is a practice.",
+  },
+  {
+    title: "Cultural Perspective",
+    body: "Mavire Codoir is rooted in Ghanaian, Jamaican, and British heritage while drawing inspiration from global traditions of craftsmanship. We value curiosity, openness, and respect for different ways of thinking and creating.",
+  },
+  {
+    title: "Building for the Long Term",
+    body: "We are not interested in chasing trends. We are interested in building a house that will endure. That requires patience, discipline, and people who believe great things take time.",
+  },
 ];
 
 export default function CareersPage() {
   return (
     <div className="pt-32 pb-24">
+      {/* Hero */}
       <section className="luxury-container max-w-4xl mx-auto text-center mb-32">
         <RevealBlock>
           <h1 className="luxury-heading-xl mb-10">Careers</h1>
         </RevealBlock>
-        <RevealBlock delay={200}>
-          <p className="text-lg md:text-xl font-medium tracking-wide leading-relaxed text-black/80 max-w-2xl mx-auto">
-            Join a house where craft, culture, and conviction converge. We are always looking for individuals who believe that how something is made matters as much as what it is.
+        <RevealBlock delay={150}>
+          <p className="text-base md:text-lg font-medium tracking-wide leading-relaxed text-black/80 max-w-2xl mx-auto mb-6">
+            Mavire Codoir is a house in the making.
+          </p>
+        </RevealBlock>
+        <RevealBlock delay={250}>
+          <p className="text-base md:text-lg font-medium tracking-wide leading-relaxed text-black/80 max-w-2xl mx-auto mb-6">
+            Built slowly. Guided by craft, culture, and intention.
+          </p>
+        </RevealBlock>
+        <RevealBlock delay={350}>
+          <p className="text-base md:text-lg font-medium tracking-wide leading-relaxed text-black/80 max-w-2xl mx-auto">
+            While we are in the early stages of our journey, we believe the
+            people who shape a house are as important as the garments it
+            creates. We are always interested in hearing from thoughtful
+            individuals who share our commitment to craftsmanship, creativity,
+            and long-term thinking.
           </p>
         </RevealBlock>
       </section>
@@ -51,14 +88,20 @@ export default function CareersPage() {
       <section className="bg-brand-cream/30 py-20 mb-32">
         <div className="luxury-container">
           <RevealBlock>
-            <h2 className="luxury-caption text-black/60 text-center mb-12">What We Value</h2>
+            <h2 className="luxury-caption text-black/60 text-center mb-12">
+              What We Value
+            </h2>
           </RevealBlock>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
             {VALUES.map((v, i) => (
               <RevealBlock key={v.title} delay={i * 150}>
                 <div className="text-center">
-                  <h3 className="text-sm tracking-widest font-medium mb-4 uppercase">{v.title}</h3>
-                  <p className="luxury-body text-black/75 leading-relaxed">{v.desc}</p>
+                  <h3 className="text-sm tracking-widest font-medium mb-4 uppercase">
+                    {v.title}
+                  </h3>
+                  <p className="luxury-body text-black/75 leading-relaxed">
+                    {v.body}
+                  </p>
                 </div>
               </RevealBlock>
             ))}
@@ -66,37 +109,45 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* Open positions */}
-      <section className="luxury-container max-w-4xl mx-auto mb-24">
+      {/* Future Opportunities */}
+      <section className="luxury-container max-w-3xl mx-auto mb-24 text-center">
         <RevealBlock>
-          <h2 className="luxury-heading-lg text-center mb-12">Open Positions</h2>
+          <h2 className="luxury-heading-lg mb-8">Future Opportunities</h2>
         </RevealBlock>
-        <div className="border-t border-black/10">
-          {OPENINGS.map((job, i) => (
-            <RevealBlock key={job.title} delay={i * 80}>
-              <div className="flex items-center justify-between py-6 border-b border-black/8 group cursor-pointer">
-                <div className="flex-1">
-                  <h3 className="text-sm tracking-wide font-medium group-hover:opacity-70 transition-opacity">{job.title}</h3>
-                  <div className="flex gap-4 mt-1">
-                    <span className="text-xs tracking-wider text-black/65">{job.location}</span>
-                    <span className="text-xs tracking-wider text-black/65">{job.type}</span>
-                    <span className="text-xs tracking-wider text-black/55">{job.dept}</span>
-                  </div>
-                </div>
-                <span className="text-xs tracking-widest uppercase text-black/55 group-hover:text-black/80 transition-colors">Apply →</span>
-              </div>
-            </RevealBlock>
-          ))}
-        </div>
+        <RevealBlock delay={150}>
+          <p className="luxury-body text-black/80 leading-relaxed mb-8">
+            As the house grows, opportunities will emerge across design, product
+            development, operations, digital experience, content, and client
+            services.
+          </p>
+        </RevealBlock>
+        <RevealBlock delay={250}>
+          <p className="luxury-body text-black/70 leading-relaxed">
+            We welcome introductions from individuals who feel aligned with our
+            values and vision.
+          </p>
+        </RevealBlock>
       </section>
 
-      {/* Speculative */}
+      {/* Introduce Yourself */}
       <section className="text-center">
         <RevealBlock>
-          <p className="luxury-body text-black/75 mb-6 max-w-md mx-auto">
-            Don&apos;t see a role that fits? We welcome speculative applications from exceptional individuals.
+          <h2 className="luxury-heading-lg mb-6">Introduce Yourself</h2>
+          <p className="luxury-body text-black/80 mb-4 max-w-md mx-auto">
+            If you would like to be considered for future opportunities, we
+            would be pleased to hear from you.
           </p>
-          <Link href="/contact" className="luxury-btn-outline">Get in Touch</Link>
+          <p className="luxury-body text-black/70 mb-8 max-w-md mx-auto">
+            Share your work, your experience, or simply tell us why Mavire
+            Codoir resonates with you.
+          </p>
+          <p className="text-xs tracking-widest uppercase text-black/50 mb-8 max-w-md mx-auto">
+            The most meaningful relationships often begin long before a role
+            exists.
+          </p>
+          <Link href="/contact" className="luxury-btn-outline">
+            Get in Touch
+          </Link>
         </RevealBlock>
       </section>
     </div>

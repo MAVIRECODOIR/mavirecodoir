@@ -18,21 +18,15 @@ export default function NotFound() {
         <h1 className="luxury-heading-xl text-white mb-6">404</h1>
         <h2 className="luxury-heading-lg text-white mb-4">Page Not Found</h2>
         <p className="luxury-body text-white/90 max-w-md mb-12">
-          The page you are looking for does not exist or has been moved. 
-          Let us guide you back to the world of MAVIRE.
+          The page you are looking for does not exist or has been moved. Let us
+          guide you back to The World of Mavire.
         </p>
-        
+
         <div className="flex flex-col sm:flex-row gap-4 items-center">
-          <Link
-            href="/"
-            className="luxury-btn-secondary-inversed"
-          >
+          <Link href="/" className="luxury-btn-secondary-inversed">
             Return Home
           </Link>
-          <Link
-            href="/collections"
-            className="luxury-btn-secondary-inversed"
-          >
+          <Link href="/collections" className="luxury-btn-secondary-inversed">
             Browse Collections
           </Link>
         </div>

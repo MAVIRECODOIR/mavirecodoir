@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import MegaNav from "./MegaNav";
 import Backdrop from "../ui/Backdrop";
+import AnimatedMenuIcon from "../ui/AnimatedMenuIcon";
 import LocalizedLink from "../LocalizedLink";
 import { useWishlist } from "@/lib/wishlist";
 import { useCart } from "@/lib/medusa/cart-context";
@@ -13,18 +14,24 @@ import { ALL_COUNTRY_CODES } from "@/config/regions";
 import { useTranslations } from "next-intl";
 
 function stripLocale(path: string): string {
-  const segs = path.split("/").filter(Boolean)
+  const segs = path.split("/").filter(Boolean);
   if (segs.length >= 2 && ALL_COUNTRY_CODES.includes(segs[0] as any)) {
-    return "/" + segs.slice(2).join("/")
+    return "/" + segs.slice(2).join("/");
   }
-  return path
+  return path;
 }
 
 /* ─── SVG icon components matching MAVIRE CODIR icon paths ─── */
 
 function BagIcon({ color }: { color: string }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M18 7h-2.25V5.75C15.75 4.79 14.97 4 14 4H10c-.96 0-1.75.78-1.75 1.75V7H6c-1.1 0-2 .89-2 2v9c0 1.1.89 2 2 2h12c1.1 0 2-.89 2-2V9c0-1.1-.89-2-2-2Zm-8.25-1.25c0-.14.11-.25.25-.25h4.01c.14 0 .25.11.25.25V7H9.76V5.75ZM18.5 18.01c0 .27-.22.5-.5.5H6c-.27 0-.5-.22-.5-.5V9.01c0-.27.22-.5.5-.5h2.25v1.5h1.5v-1.5h4.5v1.5h1.5v-1.5H18c.27 0 .5.22.5.5v9Z"
         fill={color}
@@ -35,7 +42,13 @@ function BagIcon({ color }: { color: string }) {
 
 function AccountIcon({ color }: { color: string }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M12 14c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0-8.5c1.93 0 3.5 1.57 3.5 3.5S13.93 12.5 12 12.5 8.5 10.93 8.5 9 10.07 5.5 12 5.5ZM18.75 18v2h-1.5v-2c0-.69-.56-1.25-1.25-1.25H8c-.69 0-1.25.56-1.25 1.25v2h-1.5v-2c0-1.52 1.23-2.75 2.75-2.75h8c1.52 0 2.75 1.23 2.75 2.75Z"
         fill={color}
@@ -46,7 +59,13 @@ function AccountIcon({ color }: { color: string }) {
 
 function SearchIcon({ color }: { color: string }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M20 12c0-4.42-3.58-8-8-8s-8 3.58-8 8 3.58 8 8 8c1.94 0 3.72-.69 5.1-1.84L18.94 20 20 18.94l-1.84-1.84C19.31 15.72 20 13.94 20 12Zm-8 6.5c-3.58 0-6.5-2.92-6.5-6.5S8.42 5.5 12 5.5s6.5 2.92 6.5 6.5-2.92 6.5-6.5 6.5Z"
         fill={color}
@@ -57,7 +76,13 @@ function SearchIcon({ color }: { color: string }) {
 
 function MenuIcon({ color }: { color: string }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M20 6.5H4V5h16v1.5ZM20 11.25H4v1.5h16v-1.5ZM20 17.5H4V19h16v-1.5Z"
         fill={color}
@@ -68,7 +93,13 @@ function MenuIcon({ color }: { color: string }) {
 
 function ContactPlusIcon({ color }: { color: string }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
       <path
         d="M12 8.75H8.75V12h-1.5V8.75H4v-1.5h3.25V4h1.5v3.25H12v1.5Z"
         fill={color}
@@ -79,7 +110,13 @@ function ContactPlusIcon({ color }: { color: string }) {
 
 function HeartIcon({ color, filled }: { color: string; filled?: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       {filled ? (
         <path
           d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
@@ -99,28 +136,41 @@ function HeartIcon({ color, filled }: { color: string; filled?: boolean }) {
 
 function CloseIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z" fill="currentColor" />
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"
+        fill="currentColor"
+      />
     </svg>
   );
 }
 
 export default function Header() {
   const pathname = usePathname() ?? "/";
-  const params = useParams()
-  const countryCode = (params?.countryCode as string) || ""
-  const locale = (params?.locale as string) || ""
-  const stripPath = stripLocale(pathname)
+  const params = useParams();
+  const countryCode = (params?.countryCode as string) || "";
+  const locale = (params?.locale as string) || "";
+  const stripPath = stripLocale(pathname);
   const isHomePage = stripPath === "/";
   const tnav = useTranslations("nav");
   const tc = useTranslations("common");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
+  const checkLogin = useCallback(() => {
     fetch("/api/account/me")
       .then((r) => setIsLoggedIn(r.ok))
       .catch(() => setIsLoggedIn(false));
   }, []);
+
+  useEffect(() => {
+    checkLogin();
+  }, [checkLogin, pathname]);
 
   if (stripPath === "/cart" || stripPath === "/checkout") {
     return null;
@@ -135,7 +185,6 @@ export default function Header() {
   const [isSearchMounted, setIsSearchMounted] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
 
   const handleScroll = useCallback(() => {
     setScrollY(window.scrollY);
@@ -174,32 +223,51 @@ export default function Header() {
   const closeSearch = () => setIsSearchOpen(false);
 
   useEffect(() => {
-    if (!cartId) { setCartItemCount(0); return }
-    import("../../lib/medusa/cart").then(({ getCart }) =>
-      getCart(cartId).then((cart) => {
-        if (cart) setCartItemCount(cart.items?.length || 0)
-      }).catch(() => setCartItemCount(0))
-    ).catch(() => {})
+    if (!cartId) {
+      setCartItemCount(0);
+      return;
+    }
+    import("../../lib/medusa/cart")
+      .then(({ getCart }) =>
+        getCart(cartId)
+          .then((cart) => {
+            if (cart) setCartItemCount(cart.items?.length || 0);
+          })
+          .catch(() => setCartItemCount(0)),
+      )
+      .catch(() => {});
   }, [cartId]);
 
-  const [childrenByParent, setChildrenByParent] = useState<Record<string, { label: string; handle: string }[]>>({});
+  const [childrenByParent, setChildrenByParent] = useState<
+    Record<string, { label: string; handle: string }[]>
+  >({});
   const [navReady, setNavReady] = useState(false);
 
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000";
     const apiKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY || "";
     const url = new URL("/store/collections", baseUrl);
     url.searchParams.set("fields", "id,title,handle,parent_collection_id");
     url.searchParams.set("limit", "100");
 
     fetch(url.toString(), {
-      headers: { "x-publishable-api-key": apiKey, "Content-Type": "application/json" },
+      headers: {
+        "x-publishable-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
     })
       .then((r) => r.json())
       .then((data: any) => {
         const all = data.collections || [];
         const grouped: Record<string, { label: string; handle: string }[]> = {};
-        const parentHandles = ["men", "women", "unisex", "accessories", "archive"];
+        const parentHandles = [
+          "men",
+          "women",
+          "unisex",
+          "accessories",
+          "archive",
+        ];
         for (const parentHandle of parentHandles) {
           const parent = all.find((c: any) => c.handle === parentHandle);
           if (parent) {
@@ -306,8 +374,10 @@ export default function Header() {
           <SearchIcon color={iconColor} />
         </button>
       </li>
-      {/* Mobile: icons visible only before scroll (over hero) */}
-      <li className={`${collapsed ? "hidden" : "flex"} md:hidden`}>
+      {/* Mobile: icons (hidden on homepage hero, always visible on inner pages) */}
+      <li
+        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
+      >
         <button
           onClick={openSearch}
           aria-label="search"
@@ -316,7 +386,9 @@ export default function Header() {
           <SearchIcon color={iconColor} />
         </button>
       </li>
-      <li className={`${collapsed ? "hidden" : "flex"} md:hidden`}>
+      <li
+        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
+      >
         <button
           onClick={openCart}
           aria-label="my shopping bag"
@@ -331,7 +403,9 @@ export default function Header() {
           )}
         </button>
       </li>
-      <li className={`${collapsed ? "hidden" : "flex"} md:hidden`}>
+      <li
+        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
+      >
         <button
           onClick={() => wishlist.open()}
           aria-label="my wishlist"
@@ -340,7 +414,9 @@ export default function Header() {
           <HeartIcon color={iconColor} filled={wishlist.count > 0} />
         </button>
       </li>
-      <li className={`${collapsed ? "hidden" : "flex"} md:hidden`}>
+      <li
+        className={`${isHomePage && collapsed ? "hidden" : "flex"} md:hidden`}
+      >
         <Link
           href={isLoggedIn ? "/client/my-account" : "/client/sign-up"}
           aria-label="my account"
@@ -349,14 +425,15 @@ export default function Header() {
           <AccountIcon color={iconColor} />
         </Link>
       </li>
-      <li>
+      <li className={`${isHomePage ? "" : "hidden"} md:flex`}>
         <button
-          onClick={() => setIsNavOpen(true)}
+          onClick={() => setIsNavOpen((prev) => !prev)}
           aria-label="menu toggle"
           aria-haspopup="dialog"
+          aria-expanded={isNavOpen}
           className="mavire-btn-motion flex items-center gap-1.5 h-10 pl-1 pr-0"
         >
-          <MenuIcon color={iconColor} />
+          <AnimatedMenuIcon color={iconColor} isOpen={isNavOpen} />
           <span
             className="hidden md:inline"
             style={{
@@ -410,16 +487,30 @@ export default function Header() {
             className="relative flex items-center justify-between h-full"
             style={{ padding: "0 20px" }}
           >
-            {/* Left: Contact Us (hidden on mobile) */}
-            <div className="hidden md:flex items-center h-full" style={{ width: headerSideWidth }}>
-              {contactBtn}
+            {/* Left: mobile menu + desktop Contact Us */}
+            <div
+              className="flex items-center h-full"
+              style={{ width: headerSideWidth }}
+            >
+              <button
+                onClick={() => setIsNavOpen((prev) => !prev)}
+                aria-label="menu toggle"
+                aria-haspopup="dialog"
+                aria-expanded={isNavOpen}
+                className="mavire-btn-motion flex md:hidden items-center justify-center w-9 h-9"
+              >
+                <AnimatedMenuIcon color="#000" isOpen={isNavOpen} size={20} />
+              </button>
+              <div className="hidden md:flex items-center h-full">
+                {contactBtn}
+              </div>
             </div>
 
             {/* Center: compact logo */}
             <Link
               href="/"
               aria-label="MAVIRE CODOIR - go to homepage"
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:left-1/2 md:-translate-x-1/2 max-md:!left-4 max-md:!translate-x-0 max-md:!w-[140px]"
               style={{ width: collapsedLogoWidth }}
             >
               <Image
@@ -438,7 +529,11 @@ export default function Header() {
             </Link>
 
             {/* Right: icons */}
-            <div className="flex items-center justify-end" style={{ width: headerSideWidth }}>
+            <div
+              className="flex items-center justify-end"
+              style={{ width: headerSideWidth }}
+              data-right-icons
+            >
               {iconList}
             </div>
           </div>
@@ -446,14 +541,20 @@ export default function Header() {
 
         {/* Dior-style Subcategory Navigation — sticky under header on collection routes */}
         {(() => {
-          const buildLinks = (base: string, items: { label: string; handle: string; path?: string }[]) => {
+          const buildLinks = (
+            base: string,
+            items: { label: string; handle: string; path?: string }[],
+          ) => {
             return [
               { label: "View all", href: `/${countryCode}/${locale}/${base}` },
               ...items.map((item) => {
                 const derivedPath = item.handle.startsWith(`${base}-`)
                   ? `/${base}/${item.handle.replace(`${base}-`, "")}`
                   : `/${item.handle}`;
-                return { label: item.label, href: item.path ?? `/${countryCode}/${locale}${derivedPath}` };
+                return {
+                  label: item.label,
+                  href: item.path ?? `/${countryCode}/${locale}${derivedPath}`,
+                };
               }),
             ];
           };
@@ -461,10 +562,22 @@ export default function Header() {
           if (!navReady) return null;
 
           const menLinks = buildLinks("men", childrenByParent["men"] || []);
-          const womenLinks = buildLinks("women", childrenByParent["women"] || []);
-          const unisexLinks = buildLinks("unisex", childrenByParent["unisex"] || []);
-          const accessoriesLinks = buildLinks("accessories", childrenByParent["accessories"] || []);
-          const archiveLinks = buildLinks("archive", childrenByParent["archive"] || []);
+          const womenLinks = buildLinks(
+            "women",
+            childrenByParent["women"] || [],
+          );
+          const unisexLinks = buildLinks(
+            "unisex",
+            childrenByParent["unisex"] || [],
+          );
+          const accessoriesLinks = buildLinks(
+            "accessories",
+            childrenByParent["accessories"] || [],
+          );
+          const archiveLinks = buildLinks(
+            "archive",
+            childrenByParent["archive"] || [],
+          );
 
           let navLinks: { label: string; href: string }[] = [];
           let navTitle = "";
@@ -540,10 +653,12 @@ export default function Header() {
                 >
                   {navLinks.map((item, idx, arr) => {
                     // Check if this link is active (exact match or starts with for subcollections)
-                    const itemStrip = stripLocale(item.href)
-                    const isActive = pathname === item.href || 
-                      (itemStrip !== stripLocale(navLinks[0].href) && stripPath.startsWith(itemStrip));
-                    
+                    const itemStrip = stripLocale(item.href);
+                    const isActive =
+                      pathname === item.href ||
+                      (itemStrip !== stripLocale(navLinks[0].href) &&
+                        stripPath.startsWith(itemStrip));
+
                     return (
                       <li
                         key={item.label}
@@ -553,8 +668,10 @@ export default function Header() {
                           fontWeight: 500,
                           lineHeight: "16px",
                           transitionDuration: "0.5s",
-                          transitionProperty: "color, background-color, border-color, opacity",
-                          transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                          transitionProperty:
+                            "color, background-color, border-color, opacity",
+                          transitionTimingFunction:
+                            "cubic-bezier(0.4, 0, 0.2, 1)",
                           display: "flex",
                           marginRight: idx === arr.length - 1 ? 0 : 20,
                         }}
@@ -569,7 +686,9 @@ export default function Header() {
                             whiteSpace: "nowrap",
                             textDecoration: "none",
                             color: "inherit",
-                            borderBottom: isActive ? "2px solid #33383c" : "2px solid transparent",
+                            borderBottom: isActive
+                              ? "2px solid #33383c"
+                              : "2px solid transparent",
                           }}
                         >
                           {item.label}
@@ -592,12 +711,12 @@ export default function Header() {
                 ref={searchInputRef}
                 type="text"
                 placeholder={tnav("search")}
-                 className="flex-1 ml-3 text-base font-medium tracking-wider outline-none bg-transparent"
-               />
-               <button
-                 onClick={() => setIsSearchOpen(false)}
-                 className="mavire-btn-motion p-2"
-                 aria-label={tc("close")}
+                className="flex-1 ml-3 text-base font-medium tracking-wider outline-none bg-transparent"
+              />
+              <button
+                onClick={() => setIsSearchOpen(false)}
+                className="mavire-btn-motion p-2"
+                aria-label={tc("close")}
               >
                 <CloseIcon />
               </button>
@@ -605,7 +724,12 @@ export default function Header() {
           </div>
         )}
 
-        <MegaNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} onOpenSearch={openSearch} onOpenWishlist={() => wishlist.open()} />
+        <MegaNav
+          isOpen={isNavOpen}
+          onClose={() => setIsNavOpen(false)}
+          onOpenSearch={openSearch}
+          onOpenWishlist={() => wishlist.open()}
+        />
       </>
     );
   }
@@ -677,8 +801,12 @@ export default function Header() {
         className="fixed top-0 left-0 right-0 z-[44]"
         style={{
           height: headerBarHeight,
-          backgroundColor: collapsed ? "rgba(255, 255, 255, 1)" : "rgba(255, 255, 255, 0)",
-          borderBottom: collapsed ? "1px solid rgba(0, 0, 0, 0.1)" : "1px solid transparent",
+          backgroundColor: collapsed
+            ? "rgba(255, 255, 255, 1)"
+            : "rgba(255, 255, 255, 0)",
+          borderBottom: collapsed
+            ? "1px solid rgba(0, 0, 0, 0.1)"
+            : "1px solid transparent",
           pointerEvents: collapsed ? "auto" : "none",
           transition: `background-color ${dur} ${ease}, border-bottom ${dur} ${ease}`,
         }}
@@ -688,7 +816,10 @@ export default function Header() {
           style={{ padding: "0 20px" }}
         >
           {/* Left: + Contact Us (hidden on mobile) */}
-          <div className="hidden md:flex items-center h-full" style={{ width: headerSideWidth }}>
+          <div
+            className="hidden md:flex items-center h-full"
+            style={{ width: headerSideWidth }}
+          >
             <button
               className="mavire-btn-motion flex items-center gap-1 h-full"
               aria-label={tnav("contact")}
@@ -719,11 +850,14 @@ export default function Header() {
         </div>
       </header>
 
-
       {/* ═══ Search Overlay ═══ */}
       {isSearchMounted && (
         <>
-          <Backdrop isOpen={isSearchVisible} onClose={closeSearch} zIndex={59} />
+          <Backdrop
+            isOpen={isSearchVisible}
+            onClose={closeSearch}
+            zIndex={59}
+          />
           <div
             className={`fixed inset-0 z-[60] flex items-start justify-center p-2 sm:p-4 transition-opacity duration-300 ease-out ${
               isSearchVisible ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -756,7 +890,12 @@ export default function Header() {
       )}
 
       {/* ═══ Mega Navigation ═══ */}
-      <MegaNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} onOpenSearch={openSearch} onOpenWishlist={() => wishlist.open()} />
+      <MegaNav
+        isOpen={isNavOpen}
+        onClose={() => setIsNavOpen(false)}
+        onOpenSearch={openSearch}
+        onOpenWishlist={() => wishlist.open()}
+      />
     </>
   );
 }

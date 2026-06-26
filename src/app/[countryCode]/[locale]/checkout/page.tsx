@@ -232,7 +232,7 @@ function CheckoutContent() {
         if (opts.length === 1) setSelectedShipping(opts[0].id)
       })
       .catch(console.error)
-  }, [cartId])
+  }, [cartId, cart?.region?.id])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -522,6 +522,9 @@ function CheckoutContent() {
         },
         metadata: {},
       })
+      // Sync region for the selected country before fetching shipping options
+      await updateCartRegionIfNeeded(cartId, address.country_code);
+
       // Re-fetch shipping options in background
       getShippingOptions(cartId)
         .then((opts) => {

@@ -48,6 +48,7 @@ export default function Footer() {
         { label: t("privacy"), href: "/privacy" },
         { label: t("cookies"), href: "/cookies" },
         { label: t("accessibility"), href: "/accessibility" },
+        { label: t("sitemap"), href: "/sitemap" },
       ],
     },
     {

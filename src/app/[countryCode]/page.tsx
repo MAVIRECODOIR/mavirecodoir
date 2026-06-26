@@ -17,9 +17,13 @@ interface SanityPost {
   categories: Array<{ title: string }> | null;
 }
 
-export default async function HomePage({ params }: { params: Promise<{ countryCode: string }> }) {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ countryCode: string }>;
+}) {
   const { countryCode } = await params;
-  
+
   async function getJournalEntries() {
     const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
     if (!projectId || projectId === "your-project-id") return null;
@@ -105,7 +109,7 @@ export default async function HomePage({ params }: { params: Promise<{ countryCo
       />
 
       <EditorialBanner
-        headline="World of MAVIRE"
+        headline="The World of Mavire"
         description="Japanese calm, Ghanaian soul — stories of craft, lineage, and modern luxury."
         ctaLabel="Discover More"
         ctaHref={`/${countryCode}/about`}

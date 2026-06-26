@@ -42,22 +42,22 @@ export default function HeroFullBleed({
     overlayColor === "dark"
       ? "bg-gradient-to-t from-black/40 via-transparent to-transparent"
       : overlayColor === "light"
-      ? "bg-gradient-to-t from-white/30 via-transparent to-transparent"
-      : "";
+        ? "bg-gradient-to-t from-white/30 via-transparent to-transparent"
+        : "";
 
   const positionClass =
     textPosition === "center"
       ? "items-center justify-center text-center"
       : textPosition === "bottom-left"
-      ? "items-end justify-start text-left pb-16 md:pb-24 pl-6 md:pl-12 lg:pl-20"
-      : "items-end justify-center text-center pb-16 md:pb-24";
+        ? "items-end justify-start text-left pb-16 md:pb-24 pl-6 md:pl-12 lg:pl-20"
+        : "items-end justify-center text-center pb-16 md:pb-24";
 
   const positionClassMavire =
     textPosition === "center"
       ? "items-center justify-center text-center"
       : textPosition === "bottom-left"
-      ? "items-end justify-start text-left"
-      : "items-end justify-center text-center pb-32 md:pb-2";
+        ? "items-end justify-start text-left"
+        : "items-end justify-center text-center pb-32 md:pb-2";
 
   const color = textColor === "white" ? "text-white" : "text-black";
 
@@ -89,11 +89,15 @@ export default function HeroFullBleed({
         <div className={`absolute inset-0 z-10 flex ${positionClassMavire}`}>
           <div
             className={`w-full px-6 md:px-12 lg:px-16 pb-10 md:pb-14 transition-all duration-1000 ease-out ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
             }`}
             style={{ transitionDelay: "0.5s" }}
           >
-            <div className={`max-w-[520px] ${textPosition === "bottom-left" ? "text-left" : "mx-auto text-center"}`}>
+            <div
+              className={`max-w-[520px] ${textPosition === "bottom-left" ? "text-left" : "mx-auto text-center"}`}
+            >
               {headline && (
                 <span
                   className={`block mb-5 ${color}`}
@@ -102,6 +106,7 @@ export default function HeroFullBleed({
                     fontWeight: 500,
                     letterSpacing: "0.01em",
                     lineHeight: 1.05,
+                    fontFamily: "var(--font-display), Georgia, serif",
                   }}
                 >
                   {headline}
@@ -123,16 +128,18 @@ export default function HeroFullBleed({
           </div>
         </div>
       ) : (
-        <div className={`absolute inset-0 flex flex-col ${positionClass} ${color} z-10`}>
+        <div
+          className={`absolute inset-0 flex flex-col ${positionClass} ${color} z-10`}
+        >
           <div
             className={`transition-all duration-1000 ease-out ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-8"
             }`}
             style={{ transitionDelay: "0.5s" }}
           >
-            {headline && (
-              <h1 className="luxury-heading-xl mb-4">{headline}</h1>
-            )}
+            {headline && <h1 className="luxury-heading-xl mb-4">{headline}</h1>}
             {subheadline && (
               <p className="luxury-body mb-8 max-w-md mx-auto opacity-90">
                 {subheadline}

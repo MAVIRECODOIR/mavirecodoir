@@ -28,11 +28,11 @@ export default function Backdrop({ isOpen, onClose, zIndex = 40 }: BackdropProps
 
   return (
     <div
-      className={`fixed inset-0 bg-black/30 transition-opacity duration-300 ease-out ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 bg-black/40 transition-opacity duration-300 ease-out ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
       style={{
         zIndex,
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
       }}
       onClick={onClose}
       aria-hidden="true"

@@ -18,7 +18,7 @@ const displayFont = EB_Garamond({
 export const metadata = {
   title: `${siteConfig.siteName} | Luxury Fashion & Accessories`,
   description:
-    "Discover the world of MAVIRE — celebrating creativity and craftsmanship. Shop ready-to-wear, bags, shoes, and more.",
+    "Discover The World of Mavire — celebrating creativity and craftsmanship. Shop ready-to-wear, bags, shoes, and more.",
   icons: {
     icon: "/favicon.svg",
   },
