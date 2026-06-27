@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mavire-website",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "workers_dev": true,
+  "routes": ["mavirecodoir.com/*", "www.mavirecodoir.com/*"],
+  "vars": {
+    "RESEND_FROM_EMAIL": "noreply@mavirecodoir.com",
+    "CLOUDFLARE_ACCOUNT_ID": "30a9ac5ae4015c2a629488fe19c5baa1",
+    "R2_BUCKET_NAME": "mavire-assets",
+    "R2_PUBLIC_URL": "https://pub-cb269c46bd284333bcafb48988f70133.r2.dev",
+    "R2_WORKER_URL": "https://mavire-r2-upload-worker.mavire.workers.dev",
+    "ADMIN_PANEL_PASSWORD": "admin",
+    "NEXT_PUBLIC_MEDUSA_BACKEND_URL": "https://api.mavirecodoir.com",
+    "NEXT_PUBLIC_SITE_URL": "https://mavirecodoir.com",
+    "NEXT_PUBLIC_SITE_NAME": "MAVIRE CODOIR",
+    "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_API_KEY": "pk_5bd7f16fb67464fc999009ebba49fe66faf956988ca6054fc16a5044821a36b6",
+    "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyBf9hJXenOPUM3Mk-EdesuGvhgpM7TFkCI",
+    "NEXT_PUBLIC_STRIPE_KEY": "pk_live_51SyvoL2N8HCyiHypcooL4cei52XlN9PHAs4iRqKzNFBcEWuyLrcrFcKhl7ElHDWh6VetVI7qSeqen1jV58Co7WbJ003pOaxApV",
+    "NEXT_PUBLIC_PAYPAL_CLIENT_ID": "AQ86f4CdTyI_L1IobVKNsWNPKV3xd9uKcQgS1TbYNSRvJDglGLK2KKkaYEIE0S1Crn_sGg_C2E3n1zBt",
+    "NEXT_PUBLIC_SANITY_PROJECT_ID": "6bkvaal8",
+    "NEXT_PUBLIC_SANITY_DATASET": "production",
+    "NODE_ENV": "production"
+  }
+}

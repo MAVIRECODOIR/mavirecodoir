@@ -5,6 +5,9 @@ node_modules/
 .next/
 out/
 
+# opennext
+.open-next/
+
 # env
 .env.local
 .env.*.local

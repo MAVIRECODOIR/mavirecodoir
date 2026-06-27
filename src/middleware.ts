@@ -7,7 +7,13 @@ function detectCountry(request: NextRequest): string {
   const saved = request.cookies.get('preferred_country')?.value
   if (saved && (ALL_COUNTRY_CODES as string[]).includes(saved)) return saved
 
-  const geo = (request as any).geo?.country?.toLowerCase()
+  // Vercel: request.geo.country
+  const vercelGeo = (request as any).geo?.country?.toLowerCase()
+  // Cloudflare: request.cf?.country or cf-ipcountry header
+  const cfCountry = (request as any).cf?.country?.toLowerCase()
+  const cfHeader = request.headers.get('cf-ipcountry')?.toLowerCase()
+  const geo = vercelGeo || cfCountry || cfHeader
+
   if (geo === 'gb') return 'gb'
   if (geo === 'us') return 'us'
   if (geo === 'ca') return 'ca'
