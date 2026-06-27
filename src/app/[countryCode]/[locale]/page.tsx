@@ -1,4 +1,4 @@
-import { client } from "@/lib/sanity/client";
+import { sanityFetch, TAGS } from "@/lib/sanity/client";
 import { journalPostsQuery } from "@/lib/sanity/queries";
 import { urlFor } from "@/lib/sanity/image";
 import HeroFullBleed from "@/components/sections/HeroFullBleed";
@@ -29,7 +29,7 @@ export default async function HomePage({
     if (!projectId || projectId === "your-project-id") return null;
 
     try {
-      const posts: SanityPost[] = await client.fetch(journalPostsQuery);
+      const posts: SanityPost[] = await sanityFetch.run(journalPostsQuery, {}, [TAGS.post, TAGS.journal]);
       return posts.slice(0, 3).map((post) => ({
         title: post.title,
         description: post.excerpt || "",

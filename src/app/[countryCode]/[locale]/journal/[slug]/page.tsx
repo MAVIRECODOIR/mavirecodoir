@@ -1,4 +1,4 @@
-import { client, serverClient } from "@/lib/sanity/client";
+import { sanityFetch, TAGS } from "@/lib/sanity/client";
 import { journalPostBySlugQuery, journalPathsQuery } from "@/lib/sanity/queries";
 import { urlFor } from "@/lib/sanity/image";
 import { PortableText } from "@portabletext/react";
@@ -19,18 +19,17 @@ interface Post {
 async function getPost(slug: string): Promise<Post | null> {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   if (!projectId || projectId === "your-project-id") return null;
-  return serverClient.fetch(journalPostBySlugQuery, { slug });
+  return sanityFetch.run<Post | null>(journalPostBySlugQuery, { slug }, [TAGS.post]);
 }
 
 export async function generateStaticParams() {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   if (!projectId || projectId === "your-project-id") return [];
-  const slugs = await serverClient.fetch<Array<{ slug: string }>>(journalPathsQuery);
+  const slugs = await sanityFetch.run<Array<{ slug: string }>>(journalPathsQuery, {}, [TAGS.post]);
   return slugs.map((s) => ({ slug: s.slug }));
 }
 
 export const dynamic = "force-static";
-export const revalidate = 60;
 
 export default async function JournalArticlePage({
   params,

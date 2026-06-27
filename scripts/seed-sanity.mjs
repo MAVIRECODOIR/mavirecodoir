@@ -1,12 +1,32 @@
 import { createClient } from "@sanity/client";
+import { readFileSync } from "fs";
+
+const env = readFileSync(".env.local", "utf-8");
+const match = env.match(/^SANITY_API_TOKEN=(.+)$/m);
+const token = match[1].trim();
 
 const client = createClient({
-  projectId: "9m5mm3gf",
+  projectId: "6bkvaal8",
   dataset: "production",
-  apiVersion: "2023-01-01",
+  apiVersion: "2024-01-01",
   useCdn: false,
-  token: process.env.SANITY_API_TOKEN,
+  token,
 });
+
+let keyCounter = 0;
+function k() {
+  return `key_${++keyCounter}_${Date.now()}`;
+}
+
+function addKeys(body) {
+  return body.map((block) => {
+    if (block.children) {
+      block._key = k();
+      block.children = block.children.map((child) => ({ ...child, _key: k() }));
+    }
+    return block;
+  });
+}
 
 async function createDoc(doc) {
   const result = await client.create(doc);
@@ -52,7 +72,7 @@ async function main() {
       "On the urgency of returning to considered making, limited runs, and the stories that justify each stitch.",
     publishedAt: "2026-06-10T08:00:00Z",
     categories: [{ _type: "reference", _ref: craft._id }],
-    body: [
+    body: addKeys([
       {
         _type: "block",
         style: "normal",
@@ -103,7 +123,7 @@ async function main() {
           },
         ],
       },
-    ],
+    ]),
   });
 
   await createDoc({
@@ -114,7 +134,7 @@ async function main() {
       "The Akan symbol that animates our approach to heritage — recovering what matters before reimagining it.",
     publishedAt: "2026-06-08T08:00:00Z",
     categories: [{ _type: "reference", _ref: philosophy._id }],
-    body: [
+    body: addKeys([
       {
         _type: "block",
         style: "normal",
@@ -175,7 +195,7 @@ async function main() {
           },
         ],
       },
-    ],
+    ]),
   });
 
   await createDoc({
@@ -189,7 +209,7 @@ async function main() {
       { _type: "reference", _ref: textiles._id },
       { _type: "reference", _ref: culture._id },
     ],
-    body: [
+    body: addKeys([
       {
         _type: "block",
         style: "normal",
@@ -240,7 +260,7 @@ async function main() {
           },
         ],
       },
-    ],
+    ]),
   });
 
   await createDoc({
@@ -254,7 +274,7 @@ async function main() {
       { _type: "reference", _ref: philosophy._id },
       { _type: "reference", _ref: culture._id },
     ],
-    body: [
+    body: addKeys([
       {
         _type: "block",
         style: "normal",
@@ -290,7 +310,7 @@ async function main() {
           },
         ],
       },
-    ],
+    ]),
   });
 
   console.log("\nDone! Created 4 posts and 4 categories.");

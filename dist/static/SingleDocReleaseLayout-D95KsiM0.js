@@ -1,0 +1,1 @@
+import{c as i,j as r,S as a,a as o}from"./pane2-B58nn3Po.js";function c(t){const e=i.c(4);let l;e[0]!==t?(l=t.renderDefault(t),e[0]=t,e[1]=l):l=e[1];let n;return e[2]!==l?(n=r.jsx(a,{children:r.jsx(o,{children:l})}),e[2]=l,e[3]=n):n=e[3],n}export{c as SingleDocReleaseLayout};

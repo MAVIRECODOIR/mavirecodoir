@@ -1,4 +1,4 @@
-import { client } from "@/lib/sanity/client";
+import { sanityFetch, TAGS } from "@/lib/sanity/client";
 import { journalPostsQuery } from "@/lib/sanity/queries";
 import { urlFor } from "@/lib/sanity/image";
 import Link from "next/link";
@@ -16,11 +16,10 @@ interface Post {
 async function getPosts(): Promise<Post[]> {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   if (!projectId || projectId === "your-project-id") return [];
-  return client.fetch(journalPostsQuery);
+  return sanityFetch.run<Post[]>(journalPostsQuery, {}, [TAGS.post, TAGS.journal]);
 }
 
 export const dynamic = "force-static";
-export const revalidate = 60;
 
 export default async function JournalPage() {
   const posts = await getPosts();
