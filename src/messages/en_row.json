@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "collections": "Collections",
+    "journal": "Journal",
+    "about": "About",
+    "sustainability": "Sustainability",
+    "careers": "Careers",
+    "contact": "Contact",
+    "cart": "Shopping Bag",
+    "account": "My Account",
+    "search": "Search"
+  },
+  "home": {
+    "hero_title": "Designed with Intention",
+    "hero_subtitle": "Sustainable luxury fashion for the conscious individual",
+    "shop_now": "Shop Now"
+  },
+  "product": {
+    "add_to_bag": "Add to Bag",
+    "select_size": "Select Size",
+    "size_guide": "Size Guide",
+    "description": "Description",
+    "details": "Details & Care",
+    "delivery": "Delivery & Returns",
+    "sold_out": "Sold Out",
+    "notify_me": "Notify Me"
+  },
+  "cart": {
+    "title": "Shopping Bag",
+    "empty": "Your bag is empty",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to Checkout",
+    "remove": "Remove",
+    "continue_shopping": "Continue Shopping"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shipping": "Shipping",
+    "payment": "Payment",
+    "review": "Review Order",
+    "place_order": "Place Order"
+  },
+  "footer": {
+    "client_services": "Client Services",
+    "the_house": "The House",
+    "legal": "Legal",
+    "find_us": "Find Us",
+    "contact_us": "Contact Us",
+    "faqs": "FAQs",
+    "shipping_returns": "Shipping & Returns",
+    "book_appointment": "Book an Appointment",
+    "collect_in_store": "Collect in Store",
+    "our_story": "Our Story",
+    "craftsmanship": "Craftsmanship",
+    "sustainability": "Sustainability",
+    "careers": "Careers",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookie Policy",
+    "accessibility": "Accessibility",
+    "sitemap": "Site Map",
+    "store_locator": "Store Locator",
+    "stay_connected": "Stay Connected",
+    "newsletter_desc": "Subscribe to receive updates on new collections, exclusive events, and personalised recommendations.",
+    "subscribe": "Subscribe",
+    "subscribed": "Subscribed",
+    "subscribing": "Subscribing...",
+    "thank_you": "Thank you for subscribing!",
+    "error_try_again": "Something went wrong. Try again.",
+    "copyright": "© 2025 MAVIRE CODOIR. All rights reserved."
+  },
+  "region_modal": {
+    "welcome": "Welcome to SDMNS",
+    "visiting_from": "You are visiting us from {country}.",
+    "go_to": "Go to {country} website",
+    "stay": "Continue to {country} website",
+    "other_regions": "Other countries / regions",
+    "select_region": "Select your region",
+    "select_language": "Select language",
+    "back": "Back"
+  },
+  "common": {
+    "loading": "Loading",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "close": "Close"
+  }
+}

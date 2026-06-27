@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "collections": "系列",
+    "journal": "日记",
+    "about": "关于",
+    "sustainability": "可持续发展",
+    "careers": "职业发展",
+    "contact": "联系",
+    "cart": "购物袋",
+    "account": "我的账户",
+    "search": "搜索"
+  },
+  "home": {
+    "hero_title": "精心设计",
+    "hero_subtitle": "面向有环保意识人士的可持续奢侈时尚",
+    "shop_now": "立即选购"
+  },
+  "product": {
+    "add_to_bag": "加入购物袋",
+    "select_size": "选择尺寸",
+    "size_guide": "尺码指南",
+    "description": "描述",
+    "details": "详情与保养",
+    "delivery": "配送与退货",
+    "sold_out": "已售罄",
+    "notify_me": "通知我"
+  },
+  "cart": {
+    "title": "购物袋",
+    "empty": "您的购物袋是空的",
+    "subtotal": "小计",
+    "checkout": "前往结账",
+    "remove": "删除",
+    "continue_shopping": "继续购物"
+  },
+  "checkout": {
+    "title": "结账",
+    "shipping": "运输",
+    "payment": "付款",
+    "review": "查看订单",
+    "place_order": "下单"
+  },
+  "footer": {
+    "client_services": "客户服务",
+    "the_house": "众议院",
+    "legal": "法律",
+    "find_us": "联系我们",
+    "contact_us": "联系我们",
+    "faqs": "常见问题解答",
+    "shipping_returns": "配送与退货",
+    "book_appointment": "预约",
+    "collect_in_store": "门店自提",
+    "our_story": "我们的故事",
+    "craftsmanship": "工艺",
+    "sustainability": "可持续发展",
+    "careers": "职业发展",
+    "terms": "条款与条件",
+    "privacy": "隐私政策",
+    "cookies": "Cookie 政策",
+    "accessibility": "无障碍功能",
+    "sitemap": "网站地图",
+    "store_locator": "门店查询",
+    "stay_connected": "保持联系",
+    "newsletter_desc": "订阅以获取新系列、独家活动及个性化推荐的最新资讯。",
+    "subscribe": "订阅",
+    "subscribed": "已订阅",
+    "subscribing": "正在订阅...",
+    "thank_you": "感谢您的订阅！",
+    "error_try_again": "出现错误。请重试。",
+    "copyright": "© 2025 MAVIRE CODOIR。保留所有权利。"
+  },
+  "region_modal": {
+    "welcome": "欢迎来到 SDMNS",
+    "visiting_from": "您是从 {country} 访问本网站的。",
+    "go_to": "访问 {country} 网站",
+    "stay": "继续访问 {country} 网站",
+    "other_regions": "其他国家/地区",
+    "select_region": "请选择您所在的地区",
+    "select_language": "选择语言",
+    "back": "返回"
+  },
+  "common": {
+    "loading": "正在加载",
+    "error": "出现了一些问题",
+    "retry": "请重试",
+    "close": "关闭"
+  }
+}

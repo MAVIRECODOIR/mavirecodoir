@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "collections": "コレクション",
+    "journal": "日記",
+    "about": "概要",
+    "sustainability": "持続可能性",
+    "careers": "採用情報",
+    "contact": "お問い合わせ",
+    "cart": "ショッピングバッグ",
+    "account": "マイアカウント",
+    "search": "検索"
+  },
+  "home": {
+    "hero_title": "意図を持ってデザインされた",
+    "hero_subtitle": "環境意識の高い人に向けた、サステナブルなラグジュアリーファッション",
+    "shop_now": "今すぐ購入"
+  },
+  "product": {
+    "add_to_bag": "カートに入れる",
+    "select_size": "サイズを選択",
+    "size_guide": "サイズガイド",
+    "description": "説明",
+    "details": "詳細とお手入れ方法",
+    "delivery": "配送・返品",
+    "sold_out": "完売",
+    "notify_me": "通知を受け取る"
+  },
+  "cart": {
+    "title": "ショッピングバッグ",
+    "empty": "カートは空です",
+    "subtotal": "小計",
+    "checkout": "「チェックアウトへ進む」",
+    "remove": "削除",
+    "continue_shopping": "お買い物を続ける"
+  },
+  "checkout": {
+    "title": "お会計",
+    "shipping": "配送",
+    "payment": "お支払い",
+    "review": "注文の確認",
+    "place_order": "注文する"
+  },
+  "footer": {
+    "client_services": "カスタマーサービス",
+    "the_house": "下院",
+    "legal": "法的事項",
+    "find_us": "アクセス",
+    "contact_us": "お問い合わせ",
+    "faqs": "よくある質問",
+    "shipping_returns": "配送・返品",
+    "book_appointment": "予約をする",
+    "collect_in_store": "店頭受け取り",
+    "our_story": "私たちのストーリー",
+    "craftsmanship": "職人技",
+    "sustainability": "持続可能性",
+    "careers": "採用情報",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "cookies": "クッキーに関する方針",
+    "accessibility": "アクセシビリティ",
+    "sitemap": "サイトマップ",
+    "store_locator": "店舗検索",
+    "stay_connected": "つながりを保ちましょう",
+    "newsletter_desc": "新しいコレクション、限定イベント、あなたに合わせたおすすめ情報などの最新情報を受け取るには、ぜひご登録ください。",
+    "subscribe": "購読する",
+    "subscribed": "購読中",
+    "subscribing": "購読中...",
+    "thank_you": "ご登録ありがとうございます！",
+    "error_try_again": "問題が発生しました。もう一度お試しください。",
+    "copyright": "© 2025 MAVIRE CODOIR. 全著作権所有。"
+  },
+  "region_modal": {
+    "welcome": "SDMNSへようこそ",
+    "visiting_from": "{country} から当サイトをご覧になっています。",
+    "go_to": "{country} のウェブサイトにアクセスする",
+    "stay": "{country} のウェブサイトへ進む",
+    "other_regions": "その他の国・地域",
+    "select_region": "お住まいの地域を選択してください",
+    "select_language": "言語を選択してください",
+    "back": "戻る"
+  },
+  "common": {
+    "loading": "読み込み中",
+    "error": "何か問題が発生しました",
+    "retry": "もう一度試してみてください",
+    "close": "閉じる"
+  }
+}

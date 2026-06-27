@@ -10,7 +10,8 @@
     "deploy": "opennextjs-cloudflare build && wrangler deploy",
     "deploy:dry": "opennextjs-cloudflare build && wrangler deploy --dry-run",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "translate": "node scripts/translate-locales.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.749.0",

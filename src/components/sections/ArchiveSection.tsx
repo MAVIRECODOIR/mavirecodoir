@@ -82,11 +82,10 @@ export default function ArchiveSection({ entries }: ArchiveSectionProps) {
         <div className="mb-14 md:mb-20">
           <span className="luxury-caption block mb-3">(Archive)</span>
           <h2 className="font-display text-[clamp(1.75rem,3.5vw,3rem)] font-medium tracking-[0.04em] leading-[1.05] mb-4">
-            Cultural Notes
+            The Archive
           </h2>
           <p className="luxury-body text-brand-grey-500 max-w-md">
-            Exploring the references that shape the collection — from Sankofa
-            to the material libraries of Ghana and Japan.
+            A record of beginnings, material research, and the evolving craft that shapes each collection.
           </p>
         </div>
 

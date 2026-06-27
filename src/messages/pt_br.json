@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "collections": "Coleções",
+    "journal": "Diário",
+    "about": "Sobre",
+    "sustainability": "Sustentabilidade",
+    "careers": "Carreiras",
+    "contact": "Contato",
+    "cart": "Saco de compras",
+    "account": "Minha conta",
+    "search": "Pesquisar"
+  },
+  "home": {
+    "hero_title": "Projetado com um propósito",
+    "hero_subtitle": "Moda de luxo sustentável para pessoas conscientes",
+    "shop_now": "Compre agora"
+  },
+  "product": {
+    "add_to_bag": "Adicionar ao carrinho",
+    "select_size": "Selecione o tamanho",
+    "size_guide": "Guia de tamanhos",
+    "description": "Descrição",
+    "details": "Detalhes e cuidados",
+    "delivery": "Entregas e devoluções",
+    "sold_out": "Esgotado",
+    "notify_me": "Notificar-me"
+  },
+  "cart": {
+    "title": "Saco de compras",
+    "empty": "Seu carrinho está vazio",
+    "subtotal": "Subtotal",
+    "checkout": "Seguir para o checkout",
+    "remove": "Remover",
+    "continue_shopping": "Continuar comprando"
+  },
+  "checkout": {
+    "title": "Finalizar a compra",
+    "shipping": "Frete",
+    "payment": "Pagamento",
+    "review": "Revisar pedido",
+    "place_order": "Fazer pedido"
+  },
+  "footer": {
+    "client_services": "Atendimento ao Cliente",
+    "the_house": "A Câmara",
+    "legal": "Legal",
+    "find_us": "Encontre-nos",
+    "contact_us": "Entre em contato conosco",
+    "faqs": "Perguntas frequentes",
+    "shipping_returns": "Envio e Devoluções",
+    "book_appointment": "Agende uma consulta",
+    "collect_in_store": "Retirada na loja",
+    "our_story": "Nossa história",
+    "craftsmanship": "Artesanato",
+    "sustainability": "Sustentabilidade",
+    "careers": "Carreiras",
+    "terms": "Termos e Condições",
+    "privacy": "Política de Privacidade",
+    "cookies": "Política de Cookies",
+    "accessibility": "Acessibilidade",
+    "sitemap": "Mapa do site",
+    "store_locator": "Localizador de lojas",
+    "stay_connected": "Fique conectado",
+    "newsletter_desc": "Inscreva-se para receber atualizações sobre novas coleções, eventos exclusivos e recomendações personalizadas.",
+    "subscribe": "Inscreva-se",
+    "subscribed": "Inscrito",
+    "subscribing": "Inscrevendo-se...",
+    "thank_you": "Obrigado por se inscrever!",
+    "error_try_again": "Ocorreu um erro. Tente novamente.",
+    "copyright": "© 2025 MAVIRE CODOIR. Todos os direitos reservados."
+  },
+  "region_modal": {
+    "welcome": "Bem-vindo à SDMNS",
+    "visiting_from": "Você está nos visitando a partir de {country}.",
+    "go_to": "Acesse o site {country}",
+    "stay": "Acesse o site {country}",
+    "other_regions": "Outros países/regiões",
+    "select_region": "Selecione sua região",
+    "select_language": "Selecione o idioma",
+    "back": "Voltar"
+  },
+  "common": {
+    "loading": "Carregando",
+    "error": "Algo deu errado",
+    "retry": "Tente novamente",
+    "close": "Fechar"
+  }
+}

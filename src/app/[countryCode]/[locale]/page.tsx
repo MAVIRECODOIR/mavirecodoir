@@ -97,14 +97,14 @@ export default async function HomePage({
           title: "Explore Women",
           href: `/${countryCode}/${locale}/women`,
           imageSrc:
-            "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&q=85&auto=format",
+            "https://cdn.mavirecodoir.com/content-media/pexels-beniam-447198297-28344511.jpg",
           imageAlt: "Women's collection",
         }}
         right={{
           title: "Explore Men",
           href: `/${countryCode}/${locale}/men`,
           imageSrc:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=85&auto=format",
+            "https://cdn.mavirecodoir.com/content-media/pexels-derrick-fencher-1677272333-27915205.jpg",
           imageAlt: "Men's collection",
         }}
       />
@@ -146,16 +146,16 @@ export default async function HomePage({
             description:
               "A living archive of textiles — Japanese cottons, Ghanaian prints, and the joinery between them.",
             imageSrc:
-              "https://images.unsplash.com/photo-1604176424472-9d7e2a423e1a?w=800&q=85&auto=format",
+              "https://images.unsplash.com/photo-1776164909194-bad9461153fa?w=800&q=85&auto=format",
             href: `/${countryCode}/${locale}/materials-library`,
             number: "003",
           },
           {
-            title: "Cultural Notes",
+            title: "The Atelier",
             description:
-              "Essays, references, and marginalia on the intersections of Japanese and Ghanaian design philosophy.",
+              "A record of process — from early sketches and fabric studies to the evolving language of form, texture, and craft.",
             imageSrc:
-              "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=800&q=85&auto=format",
+              "https://images.unsplash.com/photo-1761808070450-438147124f9b?w=800&q=85&auto=format",
             href: `/${countryCode}/${locale}/journal/cultural-notes`,
             number: "004",
           },
