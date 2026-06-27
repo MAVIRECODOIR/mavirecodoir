@@ -1,5 +1,4 @@
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { isValidPair } from '@/config/regions'
 import sdk from '@/lib/medusa/client'
@@ -19,7 +18,7 @@ export default async function LocaleLayout({
     notFound()
   }
 
-  const messages = await getMessages()
+  const messages = (await import(`@/messages/${locale}.json`)).default
   const { regions } = await sdk.store.region.list({ fields: "*,*countries" } as any)
 
   return (
