@@ -12,6 +12,7 @@ type HeroFullBleedProps = {
   imageSrc: string;
   imageMobileSrc?: string;
   imageAlt?: string;
+  videoSrc?: string;
   overlayColor?: "dark" | "light" | "none";
   textColor?: "white" | "black";
   textPosition?: "center" | "bottom-left" | "bottom-center";
@@ -26,6 +27,7 @@ export default function HeroFullBleed({
   imageSrc,
   imageMobileSrc,
   imageAlt = "",
+  videoSrc,
   overlayColor = "dark",
   textColor = "white",
   textPosition = "bottom-center",
@@ -63,21 +65,36 @@ export default function HeroFullBleed({
 
   return (
     <section ref={ref} className="relative w-full h-screen overflow-hidden">
-      {/* Background Image */}
-      <picture>
-        {imageMobileSrc && (
-          <source media="(max-width: 768px)" srcSet={imageMobileSrc} />
-        )}
-        <img
-          src={imageSrc}
-          alt={imageAlt}
+      {/* Background Media */}
+      {videoSrc ? (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
           className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out ${
             isVisible ? "scale-100" : "scale-105"
           }`}
-          loading="eager"
-          fetchPriority="high"
-        />
-      </picture>
+          style={{ filter: "grayscale(100%)" }}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+      ) : (
+        <picture>
+          {imageMobileSrc && (
+            <source media="(max-width: 768px)" srcSet={imageMobileSrc} />
+          )}
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out ${
+              isVisible ? "scale-100" : "scale-105"
+            }`}
+            loading="eager"
+            fetchPriority="high"
+          />
+        </picture>
+      )}
 
       {/* Overlay */}
       {overlayColor !== "none" && (

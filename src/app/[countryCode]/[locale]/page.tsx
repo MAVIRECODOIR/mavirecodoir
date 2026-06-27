@@ -79,6 +79,7 @@ export default async function HomePage({
   return (
     <>
       <HeroFullBleed
+        videoSrc="https://videos.pexels.com/video-files/9849786/9849786-uhd_1440_2732_25fps.mp4"
         imageSrc="https://cdn.mavirecodoir.com/brand/web-media/hero/gxGBTFS3NqzRZXXJyF039j1AQs.jpg"
         headline="Discover"
         ctaLabel="Our Story"
