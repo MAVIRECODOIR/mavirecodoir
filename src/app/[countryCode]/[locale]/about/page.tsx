@@ -60,8 +60,8 @@ export default function AboutPage() {
           <RevealBlock>
             <div className="aspect-[4/5] bg-brand-cream/40 overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=85&auto=format"
-                alt="Atelier"
+                src="https://cdn.mavirecodoir.com/content-media/heritage-craft-Intention.png"
+                alt="Heritage, Craft, Intention"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
